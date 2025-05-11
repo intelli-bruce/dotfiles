@@ -41,6 +41,11 @@ require("lazy").setup({
   { "hrsh7th/cmp-nvim-lsp" },
   { "L3MON4D3/LuaSnip" },
   { "tpope/vim-fugitive" },
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    config = true
+  },
 })
 
 -- 색상 테마 적용
@@ -56,8 +61,32 @@ require("lualine").setup({})
 vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true, silent = true }) -- 탐색기 토글
 vim.keymap.set("n", "<C-p>", ":Telescope find_files<CR>", { noremap = true, silent = true }) -- 파일 검색
 
+-- ToggleTerm 설정
+require("toggleterm").setup({
+  size = 20,
+  open_mapping = [[<C-\>]],
+  shade_filetypes = {},
+  shade_terminals = true,
+  shading_factor = 2,
+  start_in_insert = true,
+  insert_mappings = true,
+  persist_size = true,
+  direction = "float",
+  close_on_exit = true,
+  shell = vim.o.shell,
+  float_opts = {
+    border = "curved",
+    winblend = 0,
+    highlights = {
+      border = "Normal",
+      background = "Normal",
+    },
+  },
+})
+
 -- 터미널 단축키
-vim.keymap.set("n", "<leader>t", ":split | terminal<CR>", { noremap = true, silent = true }) -- 가로 분할 터미널
-vim.keymap.set("n", "<leader>vt", ":vsplit | terminal<CR>", { noremap = true, silent = true }) -- 세로 분할 터미널
+vim.keymap.set("n", "<leader>tf", ":ToggleTerm direction=float<CR>", { noremap = true, silent = true }) -- 플로팅 터미널
+vim.keymap.set("n", "<leader>th", ":ToggleTerm direction=horizontal<CR>", { noremap = true, silent = true }) -- 가로 분할 터미널
+vim.keymap.set("n", "<leader>tv", ":ToggleTerm direction=vertical<CR>", { noremap = true, silent = true }) -- 세로 분할 터미널
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true }) -- 터미널 모드 종료
 

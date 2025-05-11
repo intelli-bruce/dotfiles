@@ -6,7 +6,7 @@ return {
     'Apple SD Gothic Neo',
     'D2Coding',
   },
-  font_size = 15.0,
+  font_size = 16.0,
 
   color_scheme = "Dracula",
   initial_rows = 30,
