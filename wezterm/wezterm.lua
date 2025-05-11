@@ -18,6 +18,7 @@ return {
 
  -- 한글 입력 개선
   use_ime = true,
+  enable_kitty_keyboard = true, -- 일부 조합 이슈 해결
 
   -- macOS 한글 조합 지연 줄이기
   macos_forward_to_ime_modifier_mask = "SHIFT|CTRL|ALT|CMD",
