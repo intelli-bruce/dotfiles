@@ -17,5 +17,9 @@ echo "🔗 Linking Rectangle config..."
 mkdir -p "$HOME/Library/Application Support/Rectangle"
 ln -sf "$DOTFILES_DIR/rectangle/RectangleConfig.json" "$HOME/Library/Application Support/Rectangle/RectangleConfig.json"
 
+echo "🔗 Linking tmux config..."
+mkdir -p "$HOME/.config/tmux"
+ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+
 echo "✅ All config files linked!"
 
