@@ -8,7 +8,19 @@ return {
     'Apple SD Gothic Neo',
     'D2Coding',
   },
+
   font_size = 16.0,
+
+  enable_mouse = true, -- tmux와 충돌 없이 마우스 사용
+
+  -- 마우스 드래그가 wezterm에서 처리되지 않도록 막음
+  mouse_bindings = {
+    {
+      event = { Down = { streak = 1, button = "Left" } },
+      mods = "NONE",
+      action = wezterm.action.DisableDefaultAssignment,
+    },
+  },
 
   color_scheme = "Dracula",
   initial_rows = 30,
@@ -28,4 +40,3 @@ return {
   -- true color 지원
   enable_wayland = false,
 }
-
