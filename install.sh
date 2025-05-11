@@ -20,6 +20,7 @@ ln -sf "$DOTFILES_DIR/rectangle/RectangleConfig.json" "$HOME/Library/Application
 echo "🔗 Linking tmux config..."
 mkdir -p "$HOME/.config/tmux"
 ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
 echo "✅ All config files linked!"
 
