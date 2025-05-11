@@ -22,5 +22,9 @@ mkdir -p "$HOME/.config/tmux"
 ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
 ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 
+echo "🔗 Linking Yazi config..."
+mkdir -p "$HOME/.config/yazi"
+ln -sf "$DOTFILES_DIR/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
+
 echo "✅ All config files linked!"
 
