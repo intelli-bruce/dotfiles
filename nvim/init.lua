@@ -57,6 +57,17 @@ require("nvim-tree").setup({})
 -- 상태바 초기화
 require("lualine").setup({})
 
+-- mason-lspconfig 설치 목록
+require("mason-lspconfig").setup({
+  ensure_installed = {
+    "lua_ls",        -- Lua
+    "pyright",       -- Python
+    "rust_analyzer", -- Rust
+    "clangd",        -- C/C++
+    "marksman",      -- Markdown
+  },
+})
+
 -- 단축키 설정
 vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true, silent = true }) -- 탐색기 토글
 vim.keymap.set("n", "<C-p>", ":Telescope find_files<CR>", { noremap = true, silent = true }) -- 파일 검색
@@ -93,4 +104,7 @@ vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true }) -
 -- 터미널 크기 조절 단축키
 vim.keymap.set("n", "<leader>t+", ":lua require('toggleterm').resize(5)<CR>", { noremap = true, silent = true }) -- 터미널 크기 증가
 vim.keymap.set("n", "<leader>t-", ":lua require('toggleterm').resize(-5)<CR>", { noremap = true, silent = true }) -- 터미널 크기 감소
+
+-- Yazi 파일 탐색기 단축키
+vim.keymap.set("n", "<leader>fe", ":ToggleTerm direction=float cmd=yazi<CR>", { desc = "Yazi 파일 탐색기 열기", noremap = true, silent = true })
 

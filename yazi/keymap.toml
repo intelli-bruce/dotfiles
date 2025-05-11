@@ -1,0 +1,34 @@
+# Yazi keymap configuration file
+
+# File opening
+[[manager.prepend_keymap]]
+on   = ["e"]
+run  = "shell 'nvim $0'"
+desc = "Open file with Neovim"
+
+# LazyGit integration
+[[manager.prepend_keymap]]
+on = ["g", "l"]
+run = "plugin lazygit"
+desc = "Launch lazygit"
+
+# Default keybindings
+[[manager.prepend_keymap]]
+on   = ["<Esc>"]
+run  = "escape"
+desc = "Exit visual mode, clear selected, or cancel search"
+
+[[manager.prepend_keymap]]
+on   = ["q"]
+run  = "quit"
+desc = "Exit the process"
+
+[[manager.prepend_keymap]]
+on   = ["<C-q>"]
+run  = "close"
+desc = "Close the current tab, or quit if it is the last tab"
+
+[[manager.prepend_keymap]]
+on   = ["<C-z>"]
+run  = "suspend"
+desc = "Suspend the process"
