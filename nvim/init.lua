@@ -1,3 +1,7 @@
+-- 리더 키 설정 (반드시 다른 설정보다 먼저 로드되어야 함)
+vim.g.mapleader = " " -- 스페이스바를 리더 키로 설정
+vim.g.maplocalleader = " " -- 로컬 리더 키도 스페이스바로 설정
+
 -- 기본 옵션
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -6,6 +10,17 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.mouse = "a"
 vim.opt.clipboard = "unnamedplus"
+vim.opt.signcolumn = "yes" -- 사인 컬럼 항상 표시 (LSP 진단용)
+vim.opt.updatetime = 300 -- 더 빠른 업데이트 시간 (기본값은 4000ms)
+vim.opt.cursorline = true -- 현재 라인 강조
+vim.opt.wrap = false -- 라인 래핑 비활성화
+vim.opt.swapfile = false -- 스왑 파일 비활성화
+vim.opt.backup = false -- 백업 파일 비활성화
+vim.opt.undofile = true -- 영속적인 실행 취소 기록
+vim.opt.ignorecase = true -- 검색 시 대소문자 무시
+vim.opt.smartcase = true -- 대문자가 포함된 경우 대소문자 구분
+vim.opt.hlsearch = true -- 검색 결과 강조
+vim.opt.incsearch = true -- 증분 검색
 
 -- netrw 비활성화 (nvim-tree와 충돌 방지)
 vim.g.loaded_netrw = 1
@@ -39,13 +54,26 @@ require("lazy").setup({
   { "williamboman/mason-lspconfig.nvim" },
   { "hrsh7th/nvim-cmp" },
   { "hrsh7th/cmp-nvim-lsp" },
+  { "hrsh7th/cmp-buffer" },
+  { "hrsh7th/cmp-path" },
+  { "hrsh7th/cmp-cmdline" },
   { "L3MON4D3/LuaSnip" },
+  { "saadparwaiz1/cmp_luasnip" },
   { "tpope/vim-fugitive" },
   {
     "akinsho/toggleterm.nvim",
     version = "*",
     config = true
   },
+  { "nvim-lua/plenary.nvim" },
+  { "folke/trouble.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
+  { "j-hui/fidget.nvim", opts = {} },
+  { "numToStr/Comment.nvim", opts = {} },
+  { "lewis6991/gitsigns.nvim", opts = {} },
+  { "RRethy/vim-illuminate" },
+  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
+  { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
+  { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
 })
 
 -- 색상 테마 적용
@@ -57,20 +85,326 @@ require("nvim-tree").setup({})
 -- 상태바 초기화
 require("lualine").setup({})
 
--- mason-lspconfig 설치 목록
+-- Mason 설정 (LSP, linter, formatter 설치 관리자)
+require("mason").setup({
+  ui = {
+    icons = {
+      package_installed = "✓",
+      package_pending = "➜",
+      package_uninstalled = "✗"
+    }
+  }
+})
+
+-- Mason 과 LSP 설정 연결
 require("mason-lspconfig").setup({
   ensure_installed = {
     "lua_ls",        -- Lua
     "pyright",       -- Python
+    -- "typescript-language-server" 또는 "tsserver"가 아니라 Mason에서는 lspconfig 이름을 사용
+    -- TypeScript/JavaScript는 LSP 설정만 유지하고 자동 설치에서 제외
     "rust_analyzer", -- Rust
     "clangd",        -- C/C++
     "marksman",      -- Markdown
   },
+  automatic_installation = true,
 })
 
--- 단축키 설정
+-- LSP 설정
+local lspconfig = require("lspconfig")
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+-- LSP 서버 설정
+lspconfig.lua_ls.setup({
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = { "vim" }, -- vim global 인식
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false,
+      },
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
+})
+
+lspconfig.pyright.setup({
+  capabilities = capabilities,
+})
+
+-- TypeScript/JavaScript 설정 (tsserver -> tsserver로 서버 이름은 동일)
+lspconfig.tsserver.setup({
+  capabilities = capabilities,
+  settings = {
+    typescript = {
+      inlayHints = {
+        includeInlayParameterNameHints = "all",
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+      },
+    },
+    javascript = {
+      inlayHints = {
+        includeInlayParameterNameHints = "all",
+        includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+        includeInlayFunctionParameterTypeHints = true,
+        includeInlayVariableTypeHints = true,
+        includeInlayPropertyDeclarationTypeHints = true,
+        includeInlayFunctionLikeReturnTypeHints = true,
+        includeInlayEnumMemberValueHints = true,
+      },
+    },
+  },
+})
+
+-- Go 관련 설정 제거됨
+
+lspconfig.rust_analyzer.setup({
+  capabilities = capabilities,
+})
+
+lspconfig.clangd.setup({
+  capabilities = capabilities,
+})
+
+lspconfig.marksman.setup({
+  capabilities = capabilities,
+})
+
+-- Flutter와 Dart를 사용하는 경우, 다음 설정을 활성화하세요
+-- Flutter SDK가 설치되어 있어야 합니다
+-- (https://docs.flutter.dev/get-started/install/macos)
+--[[
+lspconfig.dartls.setup({
+  capabilities = capabilities,
+  -- Dart/Flutter 특정 설정
+  settings = {
+    dart = {
+      completeFunctionCalls = true,
+      showTodos = true,
+      analysisExcludedFolders = {
+        ".dart_tool",
+        ".symlinks",
+        "build",
+        "ios",
+        "android",
+        ".packages",
+      },
+    }
+  }
+})
+--]]
+
+-- nvim-cmp 설정 (자동 완성)
+local cmp = require("cmp")
+local luasnip = require("luasnip")
+
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body) -- 스니펫 확장에 LuaSnip 사용
+    end,
+  },
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+    ["<C-Space>"] = cmp.mapping.complete(),
+    ["<C-e>"] = cmp.mapping.abort(),
+    ["<CR>"] = cmp.mapping.confirm({ select = true }), -- 자동 선택 허용
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+  }),
+  sources = cmp.config.sources({
+    { name = "nvim_lsp" }, -- LSP
+    { name = "luasnip" },  -- 스니펫
+    { name = "buffer" },   -- 버퍼 내용
+    { name = "path" },     -- 파일 경로
+  }),
+  formatting = {
+    format = function(entry, vim_item)
+      -- 아이콘 추가 가능
+      local kind_icons = {
+        Text = "󰉿",
+        Method = "󰆧",
+        Function = "󰊕",
+        Constructor = "",
+        Field = "󰜢",
+        Variable = "󰀫",
+        Class = "󰠱",
+        Interface = "",
+        Module = "",
+        Property = "󰜢",
+        Unit = "󰑭",
+        Value = "󰎠",
+        Enum = "",
+        Keyword = "󰌋",
+        Snippet = "",
+        Color = "󰏘",
+        File = "󰈙",
+        Reference = "󰈇",
+        Folder = "󰉋",
+        EnumMember = "",
+        Constant = "󰏿",
+        Struct = "󰙅",
+        Event = "",
+        Operator = "󰆕",
+        TypeParameter = "󰊄",
+      }
+      vim_item.kind = string.format("%s %s", kind_icons[vim_item.kind], vim_item.kind)
+      vim_item.menu = ({
+        nvim_lsp = "[LSP]",
+        luasnip = "[Snippet]",
+        buffer = "[Buffer]",
+        path = "[Path]",
+      })[entry.source.name]
+      return vim_item
+    end,
+  },
+})
+
+-- 명령행 모드 자동 완성 설정
+cmp.setup.cmdline(":", {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+    { name = "path" },
+    { name = "cmdline" }
+  })
+})
+
+-- 검색 모드 자동 완성 설정
+cmp.setup.cmdline("/", {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = {
+    { name = "buffer" }
+  }
+})
+
+-- Trouble.nvim 설정 (진단 목록 표시)
+require("trouble").setup({
+  icons = true,
+  signs = {
+    error = "✘",
+    warning = "▲",
+    hint = "⚑",
+    information = "»",
+    other = "◦"
+  },
+  use_diagnostic_signs = false
+})
+
+-- LSP 단축키 설정
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
+vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Show references" })
+vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show hover information" })
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
+vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "Format code" })
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+
+-- Trouble.nvim 단축키
+vim.keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { desc = "Toggle trouble" })
+vim.keymap.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { desc = "Document diagnostics" })
+vim.keymap.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { desc = "Workspace diagnostics" })
+vim.keymap.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { desc = "Location list" })
+vim.keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { desc = "Quickfix list" })
+
+-- 추가 단축키 설정
+>>>>>>> dc93f2b23b5504042ee645b40a53d09d69a1eb5e
 vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true, silent = true }) -- 탐색기 토글
 vim.keymap.set("n", "<C-p>", ":Telescope find_files<CR>", { noremap = true, silent = true }) -- 파일 검색
+vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find files" })
+vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Live grep" })
+vim.keymap.set("n", "<leader>fb", ":Telescope buffers<CR>", { desc = "Find buffers" })
+vim.keymap.set("n", "<leader>fh", ":Telescope help_tags<CR>", { desc = "Help tags" })
+
+-- Comment.nvim 초기화
+require("Comment").setup({
+  mappings = {
+    basic = true,  -- 기본 매핑 활성화
+    extra = true,  -- 추가 매핑 활성화
+  },
+})
+
+-- GitSigns 초기화
+require("gitsigns").setup({
+  signs = {
+    add = { text = "│" },
+    change = { text = "│" },
+    delete = { text = "_" },
+    topdelete = { text = "‾" },
+    changedelete = { text = "~" },
+    untracked = { text = "┆" },
+  },
+  signcolumn = true,
+  numhl = false,
+  linehl = false,
+  word_diff = false,
+  watch_gitdir = {
+    follow_files = true,
+  },
+  auto_attach = true,
+  attach_to_untracked = false,
+  current_line_blame = true,
+  current_line_blame_opts = {
+    virt_text = true,
+    virt_text_pos = "eol",
+    delay = 1000,
+    ignore_whitespace = false,
+  },
+  current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d> - <summary>",
+})
+
+-- Illuminate 초기화
+require("illuminate").configure({
+  providers = {
+    "lsp",
+    "treesitter",
+    "regex",
+  },
+  delay = 100,
+  filetypes_denylist = {
+    "dirvish",
+    "fugitive",
+    "NvimTree",
+  },
+})
+
+-- Indent Blankline 초기화
+require("ibl").setup()
+
+-- Autopairs 초기화
+require("nvim-autopairs").setup()
 
 -- ToggleTerm 설정
 require("toggleterm").setup({
@@ -107,4 +441,64 @@ vim.keymap.set("n", "<leader>t-", ":lua require('toggleterm').resize(-5)<CR>", {
 
 -- Yazi 파일 탐색기 단축키
 vim.keymap.set("n", "<leader>fe", ":ToggleTerm direction=float cmd=yazi<CR>", { desc = "Yazi 파일 탐색기 열기", noremap = true, silent = true })
+-- Treesitter 설정
+require("nvim-treesitter.configs").setup({
+  ensure_installed = {
+    "lua", "vim", "vimdoc", "query", -- Neovim 개발
+    "python", "javascript", "typescript", "tsx", -- 웹/앱 개발
+    "html", "css", "json", "yaml", "toml", -- 마크업/데이터
+    "rust", "c", "cpp", -- 시스템 프로그래밍
+    "markdown", "markdown_inline", -- 추가 언어
+    -- "dart", -- Flutter/Dart 개발용 (필요시 주석 해제)
+  },
+  sync_install = false,
+  auto_install = true,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+  indent = { enable = true },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "<C-space>",
+      node_incremental = "<C-space>",
+      scope_incremental = "<C-s>",
+      node_decremental = "<C-backspace>",
+    },
+  },
+})
+
+-- 창 이동 단축키
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "창 왼쪽으로 이동" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "창 아래로 이동" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "창 위로 이동" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "창 오른쪽으로 이동" })
+
+-- 창 크기 조절 단축키
+vim.keymap.set("n", "<A-h>", ":vertical resize -2<CR>", { desc = "창 가로 크기 줄이기" })
+vim.keymap.set("n", "<A-j>", ":resize +2<CR>", { desc = "창 세로 크기 늘리기" })
+vim.keymap.set("n", "<A-k>", ":resize -2<CR>", { desc = "창 세로 크기 줄이기" })
+vim.keymap.set("n", "<A-l>", ":vertical resize +2<CR>", { desc = "창 가로 크기 늘리기" })
+
+-- 버퍼 관리 단축키
+vim.keymap.set("n", "<S-h>", ":bprevious<CR>", { desc = "이전 버퍼" })
+vim.keymap.set("n", "<S-l>", ":bnext<CR>", { desc = "다음 버퍼" })
+vim.keymap.set("n", "<leader>bd", ":bdelete<CR>", { desc = "버퍼 닫기" })
+
+-- 기타 유용한 단축키
+vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "저장", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", { desc = "검색 강조 제거", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>/", "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", { desc = "주석 토글", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "LazyGit 열기", noremap = true, silent = true })
+
+-- 쉬운 인덴트
+vim.keymap.set("v", "<", "<gv", { desc = "인덴트 줄이기 (선택 유지)" })
+vim.keymap.set("v", ">", ">gv", { desc = "인덴트 늘리기 (선택 유지)" })
+
+-- 블록 이동
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "선택 블록을 아래로 이동" })
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "선택 블록을 위로 이동" })
+>>>>>>> dc93f2b23b5504042ee645b40a53d09d69a1eb5e
 
