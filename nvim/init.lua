@@ -74,6 +74,122 @@ require("lazy").setup({
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
   { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
+
+  -- Flutter 개발용 플러그인
+  {
+    "akinsho/flutter-tools.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "stevearc/dressing.nvim", -- 선택 UI
+    },
+    lazy = false, -- 항상 로드 (ft 및 event 조건 없이)
+    config = function()
+      require("flutter-tools").setup({
+        ui = {
+          border = "rounded",
+          notification_style = "native",
+        },
+        decorations = {
+          statusline = {
+            app_version = true,
+            device = true,
+          }
+        },
+        widget_guides = {
+          enabled = true,
+        },
+        dev_log = {
+          enabled = true,
+          open_cmd = "tabedit", -- 로그를 새 탭에 표시
+        },
+        lsp = {
+          color = {
+            enabled = true,
+            background = true,
+          },
+          on_attach = function(client, bufnr)
+            -- LSP 명령어를 위한 키맵 설정
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr })
+            vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr })
+            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = bufnr })
+            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = bufnr })
+            -- 이 함수가 LSP가 연결될 때 호출됩니다
+            print("Flutter LSP connected!")
+          end,
+          capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          settings = {
+            showTodos = true,
+            completeFunctionCalls = true,
+            renameFilesWithClasses = "prompt",
+            enableSnippets = true,
+            analysisExcludedFolders = {
+              vim.fn.expand("$HOME/.pub-cache"),
+              vim.fn.expand("$HOME/fvm"),
+            },
+          }
+        },
+        debugger = {
+          enabled = true,
+          run_via_dap = true,
+        },
+        closing_tags = {
+          highlight = "ErrorMsg",
+          prefix = "//",
+          enabled = true,
+        },
+        dev_tools = {
+          autostart = false,
+          auto_open_browser = false,
+        },
+        outline = {
+          open_cmd = "30vnew",
+          auto_open = false,
+        },
+        fvm = true, -- Flutter 버전 관리자 지원 활성화
+      })
+
+      -- 플러그인 로드 후 직접 명령어 정의
+      -- 오래된 버전과 새 버전 둘 다 지원하기 위해 pcall 사용
+      local function safeRequire(module)
+        local ok, result = pcall(require, module)
+        if ok then
+          return result
+        else
+          return nil
+        end
+      end
+
+      -- Flutter 명령어 등록
+      local commands_module = safeRequire("flutter-tools.commands")
+      if commands_module then
+        if commands_module.devices then
+          vim.cmd("command! -nargs=0 FlutterDevices lua require('flutter-tools.commands').devices()")
+        elseif commands_module.list_devices then
+          vim.cmd("command! -nargs=0 FlutterDevices lua require('flutter-tools.commands').list_devices()")
+        end
+
+        if commands_module.run_command then
+          vim.cmd("command! -nargs=0 FlutterRun lua require('flutter-tools.commands').run_command()")
+        end
+      else
+        -- 명령어 모듈을 찾을 수 없는 경우 기본 명령어로 대체
+        vim.cmd([[
+          command! -nargs=0 FlutterRun terminal flutter run
+          command! -nargs=0 FlutterDevices terminal flutter devices
+          command! -nargs=0 FlutterEmulators terminal flutter emulators
+        ]])
+      end
+
+      -- 로더 실행 시 Flutter 관련 플러그인 설치 확인 메시지 출력
+      print("Flutter Tools 플러그인이 로드되었습니다.")
+    end,
+  },
+  { "mfussenegger/nvim-dap" },
+  { "nvim-neotest/nvim-nio" }, -- nvim-dap-ui의 종속성
+  { "rcarriga/nvim-dap-ui", dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } },
+  { "theHamsta/nvim-dap-virtual-text", dependencies = { "mfussenegger/nvim-dap" } },
+  { "stevearc/dressing.nvim" }, -- 향상된 UI 구성 요소
+  { "rafamadriz/friendly-snippets" }, -- 추가 스니펫 컬렉션
 })
 
 -- 색상 테마 적용
@@ -93,7 +209,8 @@ require("mason").setup({
       package_pending = "➜",
       package_uninstalled = "✗"
     }
-  }
+  },
+  log_level = vim.log.levels.DEBUG, -- 문제 해결을 위해 로깅 레벨 증가
 })
 
 -- Mason 과 LSP 설정 연결
@@ -101,8 +218,7 @@ require("mason-lspconfig").setup({
   ensure_installed = {
     "lua_ls",        -- Lua
     "pyright",       -- Python
-    -- "typescript-language-server" 또는 "tsserver"가 아니라 Mason에서는 lspconfig 이름을 사용
-    -- TypeScript/JavaScript는 LSP 설정만 유지하고 자동 설치에서 제외
+    "ts_ls",         -- Typescript (tsserver 대신)
     "rust_analyzer", -- Rust
     "clangd",        -- C/C++
     "marksman",      -- Markdown
@@ -137,8 +253,8 @@ lspconfig.pyright.setup({
   capabilities = capabilities,
 })
 
--- TypeScript/JavaScript 설정 (tsserver -> tsserver로 서버 이름은 동일)
-lspconfig.tsserver.setup({
+-- TypeScript/JavaScript 설정 (tsserver -> ts_ls로 서버 이름 변경)
+lspconfig.ts_ls.setup({
   capabilities = capabilities,
   settings = {
     typescript = {
@@ -166,8 +282,6 @@ lspconfig.tsserver.setup({
   },
 })
 
--- Go 관련 설정 제거됨
-
 lspconfig.rust_analyzer.setup({
   capabilities = capabilities,
 })
@@ -180,29 +294,8 @@ lspconfig.marksman.setup({
   capabilities = capabilities,
 })
 
--- Flutter와 Dart를 사용하는 경우, 다음 설정을 활성화하세요
--- Flutter SDK가 설치되어 있어야 합니다
--- (https://docs.flutter.dev/get-started/install/macos)
---[[
-lspconfig.dartls.setup({
-  capabilities = capabilities,
-  -- Dart/Flutter 특정 설정
-  settings = {
-    dart = {
-      completeFunctionCalls = true,
-      showTodos = true,
-      analysisExcludedFolders = {
-        ".dart_tool",
-        ".symlinks",
-        "build",
-        "ios",
-        "android",
-        ".packages",
-      },
-    }
-  }
-})
---]]
+-- Flutter/Dart LSP 설정은 flutter-tools.nvim이 자동으로 설정함
+-- 직접 설정하지 않음 (dartls는 mason-lspconfig에서 유효한 이름이 아님)
 
 -- nvim-cmp 설정 (자동 완성)
 local cmp = require("cmp")
@@ -327,10 +420,98 @@ vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Show references" })
 vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show hover information" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "Format code" })
+vim.keymap.set("n", "<leader>cf", function()
+  vim.lsp.buf.format({ async = true })
+  print("Formatting code with LSP")
+end, { desc = "Format code" })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+
+-- nvim-dap 디버깅 설정
+local dap = require("dap")
+local dapui = require("dapui")
+
+-- DAP UI 설정
+dapui.setup({
+  layouts = {
+    {
+      elements = {
+        "scopes",
+        "breakpoints",
+        "stacks",
+        "watches",
+      },
+      size = 40,
+      position = "left",
+    },
+    {
+      elements = {
+        "repl",
+        "console",
+      },
+      size = 10,
+      position = "bottom",
+    },
+  },
+})
+
+-- 가상 텍스트 설정 (변수 값 표시)
+require("nvim-dap-virtual-text").setup({
+  enabled = true,
+  enabled_commands = true,
+  highlight_changed_variables = true,
+  highlight_new_as_changed = true,
+  all_frames = true,
+  virt_text_pos = "eol",
+  all_references = true,
+  display_callback = function(variable, buf, stackframe, node, options)
+    if options.virt_text_pos == "eol" then
+      return " = " .. variable.value
+    else
+      return variable.name .. " = " .. variable.value
+    end
+  end,
+})
+
+-- Flutter/Dart 디버깅 설정
+dap.adapters.dart = {
+  type = "executable",
+  command = "flutter",
+  args = { "debug_adapter" }
+}
+
+dap.configurations.dart = {
+  {
+    type = "dart",
+    request = "launch",
+    name = "Flutter 앱 실행",
+    program = "${workspaceFolder}/lib/main.dart",
+    cwd = "${workspaceFolder}",
+    toolArgs = {"-d", "chrome"} -- 기본적으로 Chrome에서 실행 (변경 가능)
+  }
+}
+
+-- 이벤트에 따른 자동 UI 표시/숨김
+dap.listeners.after.event_initialized["dapui_config"] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+  dapui.close()
+end
+
+-- 디버깅 단축키
+vim.keymap.set("n", "<leader>db", function() require("dap").toggle_breakpoint() end, { desc = "breakpoint 토글" })
+vim.keymap.set("n", "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, { desc = "조건부 breakpoint 설정" })
+vim.keymap.set("n", "<leader>dc", function() require("dap").continue() end, { desc = "디버깅 시작/계속" })
+vim.keymap.set("n", "<leader>dn", function() require("dap").step_over() end, { desc = "다음 단계로" })
+vim.keymap.set("n", "<leader>di", function() require("dap").step_into() end, { desc = "함수 내부로" })
+vim.keymap.set("n", "<leader>do", function() require("dap").step_out() end, { desc = "함수 밖으로" })
+vim.keymap.set("n", "<leader>dq", function() require("dap").terminate() end, { desc = "디버깅 종료" })
+vim.keymap.set("n", "<leader>du", function() require("dapui").toggle() end, { desc = "디버깅 UI 토글" })
 
 -- Trouble.nvim 단축키
 vim.keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { desc = "Toggle trouble" })
@@ -340,7 +521,6 @@ vim.keymap.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { desc = "Lo
 vim.keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { desc = "Quickfix list" })
 
 -- 추가 단축키 설정
->>>>>>> dc93f2b23b5504042ee645b40a53d09d69a1eb5e
 vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true, silent = true }) -- 탐색기 토글
 vim.keymap.set("n", "<C-p>", ":Telescope find_files<CR>", { noremap = true, silent = true }) -- 파일 검색
 vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find files" })
@@ -449,7 +629,7 @@ require("nvim-treesitter.configs").setup({
     "html", "css", "json", "yaml", "toml", -- 마크업/데이터
     "rust", "c", "cpp", -- 시스템 프로그래밍
     "markdown", "markdown_inline", -- 추가 언어
-    -- "dart", -- Flutter/Dart 개발용 (필요시 주석 해제)
+    "dart", -- Flutter/Dart 개발용
   },
   sync_install = false,
   auto_install = true,
@@ -486,6 +666,38 @@ vim.keymap.set("n", "<S-h>", ":bprevious<CR>", { desc = "이전 버퍼" })
 vim.keymap.set("n", "<S-l>", ":bnext<CR>", { desc = "다음 버퍼" })
 vim.keymap.set("n", "<leader>bd", ":bdelete<CR>", { desc = "버퍼 닫기" })
 
+-- LuaSnip 설정 - Flutter 스니펫 로드
+require("luasnip.loaders.from_vscode").lazy_load()
+require("luasnip").filetype_extend("dart", { "flutter" })
+
+-- 명령어는 플러그인 설정에서 정의됨
+
+-- Flutter 관련 명령어 단축키 설정
+local opts = { noremap = true, silent = true }
+
+-- 기본 명령어 (직접 터미널에서 실행)
+vim.keymap.set("n", "<leader>rf", ":terminal flutter run<CR>", { desc = "Flutter 앱 실행", unpack(opts) })
+vim.keymap.set("n", "<leader>rv", ":terminal flutter devices<CR>", { desc = "Flutter 기기 목록", unpack(opts) })
+vim.keymap.set("n", "<leader>re", ":terminal flutter emulators<CR>", { desc = "Flutter 에뮬레이터 목록", unpack(opts) })
+vim.keymap.set("n", "<leader>rp", ":terminal flutter pub get<CR>", { desc = "Flutter pub get", unpack(opts) })
+-- Flutter 앱 실행 시 핫 리로드/핫 리스타트는 터미널에서 r/R 키를 입력하여 사용
+-- 참고 안내 주석
+-- 일반 Neovim에서는 앱이 실행 중인 터미널 창으로 전환한 후:
+-- - 'r'을 입력하여 핫 리로드 (상태 유지)
+-- - 'R'을 입력하여 핫 리스타트 (상태 초기화)
+
+-- 플러그인 명령어도 시도 (사용 가능한 경우에만 작동)
+vim.keymap.set("n", "<leader>fr", ":FlutterRun<CR>", { desc = "Flutter 앱 실행", unpack(opts) })
+vim.keymap.set("n", "<leader>fv", ":FlutterDevices<CR>", { desc = "Flutter 기기 목록", unpack(opts) })
+
+-- 자동 Hot-Reload 설정
+vim.cmd [[
+  augroup flutter_autosave
+    autocmd!
+    autocmd BufWritePost *.dart silent! :FlutterReload
+  augroup END
+]]
+
 -- 기타 유용한 단축키
 vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "저장", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, silent = true })
@@ -500,5 +712,3 @@ vim.keymap.set("v", ">", ">gv", { desc = "인덴트 늘리기 (선택 유지)" }
 -- 블록 이동
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "선택 블록을 아래로 이동" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "선택 블록을 위로 이동" })
->>>>>>> dc93f2b23b5504042ee645b40a53d09d69a1eb5e
-
