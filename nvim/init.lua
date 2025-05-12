@@ -79,6 +79,15 @@ require("lazy").setup({
   { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
   { "github/copilot.vim" }, -- GitHub Copilot
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    dependencies = {
+      { "github/copilot.vim" },
+      { "nvim-lua/plenary.nvim" },
+    },
+    build = "make tiktoken", -- MacOS/Linux에만 필요
+    opts = {}, -- 기본 설정 사용
+  },
 
   -- Flutter 개발용 플러그인
   {
@@ -761,3 +770,53 @@ vim.api.nvim_set_keymap("i", "<C-L>", 'copilot#Next()', { silent = true, expr = 
 vim.g.copilot_filetypes = {
   ["*"] = true,
 }
+
+-- GitHub Copilot Chat 설정
+local copilot_chat = require("CopilotChat")
+copilot_chat.setup({
+  -- 단축키 설정
+  mappings = {
+    -- 프롬프트 제출
+    submit_prompt = {
+      normal = "<leader>cc",
+      insert = "<C-c>c",
+    },
+    -- 코드 리뷰
+    review_code = {
+      normal = "<leader>cr",
+    },
+    -- 코드 설명
+    explain_code = {
+      normal = "<leader>ce",
+    },
+    -- 에러 수정
+    fix_diagnostic = {
+      normal = "<leader>cf",
+    },
+    -- 다음/이전 이력
+    next_entry = {
+      normal = "]h",
+    },
+    prev_entry = {
+      normal = "[h",
+    },
+  },
+  -- 사용자 정의 프롬프트
+  prompts = {
+    Refactor = {
+      prompt = "Refactor the following code to improve readability and efficiency:",
+      mapping = "<leader>cfr",
+      description = "코드 리팩토링",
+    },
+    Optimize = {
+      prompt = "Optimize the following code for better performance:",
+      mapping = "<leader>cfo",
+      description = "코드 최적화",
+    },
+    DocString = {
+      prompt = "Create a comprehensive documentation string for the following code:",
+      mapping = "<leader>cfd",
+      description = "문서화 생성",
+    },
+  },
+})
