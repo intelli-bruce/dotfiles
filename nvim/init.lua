@@ -625,7 +625,8 @@ require("toggleterm").setup({
 vim.keymap.set("n", "<leader>tf", ":ToggleTerm direction=float<CR>", { noremap = true, silent = true }) -- 플로팅 터미널
 vim.keymap.set("n", "<leader>th", ":ToggleTerm direction=horizontal<CR>", { noremap = true, silent = true }) -- 가로 분할 터미널
 vim.keymap.set("n", "<leader>tv", ":ToggleTerm direction=vertical<CR>", { noremap = true, silent = true }) -- 세로 분할 터미널
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true }) -- 터미널 모드 종료
+-- vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true }) -- 기존 ESC 매핑 비활성화
+vim.keymap.set("t", "<C-]>", "<C-\\><C-n>", { noremap = true, silent = true, desc = "터미널 모드 종료" }) -- 대체 키 매핑
 
 -- 터미널 크기 조절 단축키
 vim.keymap.set("n", "<leader>t+", ":lua require('toggleterm').resize(5)<CR>", { noremap = true, silent = true }) -- 터미널 크기 증가
@@ -715,7 +716,32 @@ vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "저장", noremap = true, si
 vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", { desc = "검색 강조 제거", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>/", "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", { desc = "주석 토글", noremap = true, silent = true })
-vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "LazyGit 열기", noremap = true, silent = true })
+-- LazyGit 특별 설정 (ToggleTerm 사용)
+local lazygit_config = function()
+  local Terminal = require('toggleterm.terminal').Terminal
+  local lazygit = Terminal:new({
+    cmd = "lazygit",
+    hidden = true,
+    direction = "float",
+    float_opts = {
+      border = "curved",
+    },
+    on_open = function(term)
+      vim.cmd("startinsert!")
+      -- LazyGit 버퍼에서 ESC 키 매핑 제거
+      vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<Esc>", "<Esc>", { noremap = true, silent = true })
+    end,
+  })
+
+  function _lazygit_toggle()
+    lazygit:toggle()
+  end
+
+  return lazygit
+end
+
+local lazygit = lazygit_config()
+vim.keymap.set("n", "<leader>gg", "<cmd>lua _lazygit_toggle()<CR>", { desc = "LazyGit 열기", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>fh", ":Git log -- %<CR>", { desc = "현재 파일 히스토리 보기", noremap = true })
 
 -- 쉬운 인덴트
