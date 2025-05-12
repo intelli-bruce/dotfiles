@@ -7,6 +7,9 @@ accordion-padding = 10
 default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
+# Monitor focus 설정
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
 # Gaps settings
 [gaps]
 inner.horizontal = 10
@@ -20,11 +23,15 @@ outer.right = 10
 [mode.main.binding]
 # Use Option(Alt) as modifier for Aerospace
 
-# Focus movement
-alt-h = 'focus left'
-alt-j = 'focus down'
-alt-k = 'focus up'
-alt-l = 'focus right'
+# Focus movement (with cross-monitor support)
+alt-h = 'focus left --boundaries all-monitors-outer-frame'
+alt-j = 'focus down --boundaries all-monitors-outer-frame'
+alt-k = 'focus up --boundaries all-monitors-outer-frame'
+alt-l = 'focus right --boundaries all-monitors-outer-frame'
+
+# Monitor focus movement
+alt-tab = 'move-workspace-to-monitor --wrap-around next'
+alt-shift-tab = 'move-workspace-to-monitor --wrap-around prev'
 
 # Window movement
 alt-shift-h = 'move left'
