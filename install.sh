@@ -27,6 +27,10 @@ mkdir -p "$HOME/.config/yazi"
 ln -sf "$DOTFILES_DIR/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
 ln -sf "$DOTFILES_DIR/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
 
+echo "🔗 Linking Aerospace config..."
+mkdir -p "$HOME/.config/aerospace"
+ln -sf "$DOTFILES_DIR/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
+
 echo "🔧 Installing Yazi plugins..."
 mkdir -p "$HOME/.config/yazi/plugins"
 # 이미 설치된 플러그인 확인
