@@ -48,6 +48,10 @@ require("lazy").setup({
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" }
   },
+  {
+    "nvim-telescope/telescope-file-browser.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+  },
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
   { "neovim/nvim-lspconfig" },
   { "williamboman/mason.nvim" },
@@ -200,6 +204,14 @@ require("nvim-tree").setup({})
 
 -- 상태바 초기화
 require("lualine").setup({})
+
+-- Telescope 확장 기능 설정
+require("telescope").setup({})
+require("telescope").load_extension("file_browser")
+
+-- Telescope file browser 단축키 설정
+vim.keymap.set("n", "<leader>fb", ":Telescope file_browser<CR>", { desc = "파일 브라우저 열기", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>fp", ":Telescope file_browser path=%:p:h<CR>", { desc = "현재 파일 위치에서 브라우저 열기", noremap = true, silent = true })
 
 -- Mason 설정 (LSP, linter, formatter 설치 관리자)
 require("mason").setup({
@@ -704,6 +716,7 @@ vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, si
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", { desc = "검색 강조 제거", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>/", "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", { desc = "주석 토글", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "LazyGit 열기", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>fh", ":Git log -- %<CR>", { desc = "현재 파일 히스토리 보기", noremap = true })
 
 -- 쉬운 인덴트
 vim.keymap.set("v", "<", "<gv", { desc = "인덴트 줄이기 (선택 유지)" })
