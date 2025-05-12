@@ -78,6 +78,7 @@ require("lazy").setup({
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
   { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
+  { "github/copilot.vim" }, -- GitHub Copilot
 
   -- Flutter 개발용 플러그인
   {
@@ -751,3 +752,12 @@ vim.keymap.set("v", ">", ">gv", { desc = "인덴트 늘리기 (선택 유지)" }
 -- 블록 이동
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "선택 블록을 아래로 이동" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "선택 블록을 위로 이동" })
+
+-- GitHub Copilot 설정
+vim.g.copilot_no_tab_map = true
+vim.api.nvim_set_keymap("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
+vim.api.nvim_set_keymap("i", "<C-H>", 'copilot#Previous()', { silent = true, expr = true })
+vim.api.nvim_set_keymap("i", "<C-L>", 'copilot#Next()', { silent = true, expr = true })
+vim.g.copilot_filetypes = {
+  ["*"] = true,
+}
