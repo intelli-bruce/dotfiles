@@ -31,6 +31,10 @@ echo "🔗 Linking Aerospace config..."
 mkdir -p "$HOME/.config/aerospace"
 ln -sf "$DOTFILES_DIR/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
 
+echo "🔗 Linking Lazygit config..."
+mkdir -p "$HOME/.config/lazygit"
+ln -sf "$DOTFILES_DIR/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
+
 echo "🔧 Installing Yazi plugins..."
 mkdir -p "$HOME/.config/yazi/plugins"
 # 이미 설치된 플러그인 확인

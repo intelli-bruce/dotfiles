@@ -1,0 +1,30 @@
+# Lazygit 설정
+gui:
+  theme:
+    activeBorderColor:
+      - magenta
+      - bold
+    inactiveBorderColor:
+      - white
+    optionsTextColor:
+      - blue
+    selectedLineBgColor:
+      - '#44475a' # Dracula dark grey
+    selectedRangeBgColor:
+      - '#44475a' # Dracula dark grey
+    cherryPickedCommitBgColor:
+      - cyan
+    cherryPickedCommitFgColor:
+      - blue
+    unstagedChangesColor:
+      - red
+
+# Dracula theme colors
+  # Foreground color: #f8f8f2
+  # Background color: #282a36
+  # Selection/comment: #44475a
+  # Green: #50fa7b
+  # Red: #ff5555
+  # Purple: #bd93f9
+  # Yellow: #f1fa8c
+  # Pink: #ff79c6

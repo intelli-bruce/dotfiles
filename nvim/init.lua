@@ -41,7 +41,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- 플러그인 설치 목록
 require("lazy").setup({
-  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+  { "dracula/vim", name = "dracula", priority = 1000 },
   { "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" } },
   { "nvim-lualine/lualine.nvim" },
   {
@@ -207,16 +207,51 @@ require("lazy").setup({
 })
 
 -- 색상 테마 적용
-vim.cmd.colorscheme "catppuccin-mocha"
+vim.cmd.colorscheme "dracula"
 
 -- nvim-tree 초기화
-require("nvim-tree").setup({})
+require("nvim-tree").setup({
+  renderer = {
+    icons = {
+      show = {
+        file = true,
+        folder = true,
+        git = true,
+      },
+    },
+  },
+  -- Dracula 테마에 맞는 색상 설정
+  git = {
+    ignore = false,
+  },
+})
 
 -- 상태바 초기화
-require("lualine").setup({})
+require("lualine").setup({
+  options = {
+    theme = 'dracula',
+    component_separators = { left = '', right = '' },
+    section_separators = { left = '', right = '' },
+  },
+})
 
 -- Telescope 확장 기능 설정
-require("telescope").setup({})
+require("telescope").setup({
+  defaults = {
+    -- Dracula 색상과 어울리는 설정
+    prompt_prefix = " ",
+    selection_caret = " ",
+    sorting_strategy = "ascending",
+    layout_config = {
+      horizontal = {
+        prompt_position = "top",
+      },
+    },
+    -- Dracula 테마 색상
+    color_devicons = true,
+    borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+  },
+})
 require("telescope").load_extension("file_browser")
 
 -- Telescope file browser 단축키 설정
