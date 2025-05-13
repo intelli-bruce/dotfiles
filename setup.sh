@@ -55,9 +55,14 @@ bash "$DOTFILES_DIR/install.sh"
 success "dotfiles 연결 완료"
 
 # 3. macOS 기본 설정
-step "3/3: macOS 시스템 설정 구성 중..."
+step "3/4: macOS 시스템 설정 구성 중..."
 bash "$DOTFILES_DIR/scripts/macos_defaults.sh"
 success "macOS 시스템 설정 구성 완료"
+
+# 4. 키 반복 최적화 설정
+step "4/4: 키 반복 설정 최적화 중..."
+bash "$DOTFILES_DIR/scripts/optimize_key_repeat.sh"
+success "키 반복 설정 최적화 완료"
 
 # 완료 메시지
 echo "
