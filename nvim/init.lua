@@ -210,6 +210,11 @@ require("lazy").setup({
 vim.cmd.colorscheme "dracula"
 
 -- Dracula Colorful 스타일을 위한 추가 하이라이팅 설정
+-- 기본 텍스트 색상을 약간 더 어둡게 변경 (#F8F8F2 -> #E6E6E6)
+vim.api.nvim_command("highlight Normal guifg=#E6E6E6 guibg=#282A36")
+vim.api.nvim_command("highlight NormalFloat guifg=#E6E6E6 guibg=#282A36")
+vim.api.nvim_command("highlight NormalNC guifg=#CCCCCC guibg=#282A36")
+
 vim.api.nvim_command("highlight Comment ctermfg=61 guifg=#6272A4")
 vim.api.nvim_command("highlight CursorLine ctermbg=234 guibg=#44475A")
 vim.api.nvim_command("highlight Visual ctermbg=61 guibg=#3E4452")
@@ -224,6 +229,12 @@ vim.api.nvim_command("highlight PreProc ctermfg=141 guifg=#BD93F9")
 vim.api.nvim_command("highlight Number ctermfg=215 guifg=#FFB86C")
 vim.api.nvim_command("highlight Special ctermfg=141 guifg=#BD93F9")
 vim.api.nvim_command("highlight Type ctermfg=84 guifg=#50FA7B")
+
+-- 특수 텍스트 요소들도 약간 더 어둡게 조정
+vim.api.nvim_command("highlight NonText guifg=#CCCCCC")
+vim.api.nvim_command("highlight SpecialKey guifg=#CCCCCC")
+vim.api.nvim_command("highlight Whitespace guifg=#444444") -- 탭, 공백 등 표시
+vim.api.nvim_command("highlight LineNr guifg=#AAAAAA") -- 라인 번호
 
 -- nvim-tree 초기화
 require("nvim-tree").setup({
@@ -306,7 +317,7 @@ require("telescope").setup({
     TelescopePromptBorder = { fg = "#BD93F9" },
     TelescopeResultsBorder = { fg = "#FF79C6" },
     TelescopePreviewBorder = { fg = "#8BE9FD" },
-    TelescopeSelection = { bg = "#44475A", fg = "#F8F8F2" },
+    TelescopeSelection = { bg = "#44475A", fg = "#E6E6E6" },
     TelescopeSelectionCaret = { fg = "#FF79C6" },
     TelescopeMultiSelection = { fg = "#50FA7B" },
     TelescopeNormal = { bg = "#282A36" },
