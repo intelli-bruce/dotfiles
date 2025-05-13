@@ -842,6 +842,16 @@ vim.cmd [[
 vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "저장", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", { desc = "검색 강조 제거", noremap = true, silent = true })
+-- ESC 키로 검색 하이라이팅 제거
+vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "검색 하이라이팅 제거", noremap = true, silent = true })
+
+-- 더 안정적인 방법: 자동 명령어로 ESC 키 누를 때 자동으로 하이라이팅 제거
+vim.cmd([[
+  augroup clear_search_highlight
+    autocmd!
+    autocmd InsertEnter * :nohlsearch
+  augroup END
+]])
 vim.keymap.set("n", "<leader>/", "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", { desc = "주석 토글", noremap = true, silent = true })
 -- LazyGit 특별 설정 (ToggleTerm 사용)
 local lazygit_config = function()
