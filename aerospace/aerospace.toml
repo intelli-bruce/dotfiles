@@ -23,6 +23,9 @@ outer.right = 10
 [mode.main.binding]
 # Use Option(Alt) as modifier for Aerospace
 
+alt-slash = 'layout tiles horizontal vertical'
+alt-comma = 'layout accordion horizontal vertical' 
+
 # Focus movement (with cross-monitor support)
 alt-h = 'focus left --boundaries all-monitors-outer-frame'
 alt-j = 'focus down --boundaries all-monitors-outer-frame'
@@ -38,6 +41,18 @@ alt-shift-h = 'move left'
 alt-shift-j = 'move down'
 alt-shift-k = 'move up'
 alt-shift-l = 'move right'
+
+# Window resize (큰 값으로 설정하여 키 반복 효과 향상)
+alt-ctrl-h = 'resize width -50'
+alt-ctrl-j = 'resize height +50'
+alt-ctrl-k = 'resize height -50'
+alt-ctrl-l = 'resize width +50'
+
+# Smart resize (based on container orientation)
+alt-ctrl-left = 'resize smart -50'
+alt-ctrl-down = 'resize smart +50'
+alt-ctrl-up = 'resize smart -50'
+alt-ctrl-right = 'resize smart +50'
 
 # Fullscreen toggle
 alt-shift-f = 'fullscreen'
