@@ -437,8 +437,18 @@ require("trouble").setup({
 })
 
 -- LSP 단축키 설정
-vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
-vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Show references" })
+vim.keymap.set("n", "gd", function()
+  require('telescope.builtin').lsp_definitions({
+    jump_type = "vsplit",
+    reuse_win = true,
+  })
+end, { desc = "Go to definition with Telescope" })
+vim.keymap.set("n", "gr", function()
+  require('telescope.builtin').lsp_references({
+    include_declaration = false,
+    show_line = true,
+  })
+end, { desc = "Show references in Telescope" })
 vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show hover information" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
