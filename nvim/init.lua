@@ -206,8 +206,24 @@ require("lazy").setup({
   { "rafamadriz/friendly-snippets" }, -- 추가 스니펫 컬렉션
 })
 
--- 색상 테마 적용
+-- 색상 테마 적용 (Dracula Colorful 스타일)
 vim.cmd.colorscheme "dracula"
+
+-- Dracula Colorful 스타일을 위한 추가 하이라이팅 설정
+vim.api.nvim_command("highlight Comment ctermfg=61 guifg=#6272A4")
+vim.api.nvim_command("highlight CursorLine ctermbg=234 guibg=#44475A")
+vim.api.nvim_command("highlight Visual ctermbg=61 guibg=#3E4452")
+vim.api.nvim_command("highlight Search ctermbg=180 ctermfg=16 guibg=#FFB86C guifg=#282A36")
+vim.api.nvim_command("highlight IncSearch ctermbg=169 ctermfg=16 guibg=#FF79C6 guifg=#282A36")
+vim.api.nvim_command("highlight String ctermfg=228 guifg=#F1FA8C")
+vim.api.nvim_command("highlight Function ctermfg=84 guifg=#50FA7B")
+vim.api.nvim_command("highlight Identifier ctermfg=159 guifg=#8BE9FD")
+vim.api.nvim_command("highlight Statement ctermfg=212 guifg=#FF79C6")
+vim.api.nvim_command("highlight Keyword ctermfg=212 guifg=#FF79C6")
+vim.api.nvim_command("highlight PreProc ctermfg=141 guifg=#BD93F9")
+vim.api.nvim_command("highlight Number ctermfg=215 guifg=#FFB86C")
+vim.api.nvim_command("highlight Special ctermfg=141 guifg=#BD93F9")
+vim.api.nvim_command("highlight Type ctermfg=84 guifg=#50FA7B")
 
 -- nvim-tree 초기화
 require("nvim-tree").setup({
@@ -226,30 +242,75 @@ require("nvim-tree").setup({
   },
 })
 
--- 상태바 초기화
+-- 상태바 초기화 (Dracula Colorful 스타일)
 require("lualine").setup({
   options = {
     theme = 'dracula',
     component_separators = { left = '', right = '' },
     section_separators = { left = '', right = '' },
+    globalstatus = true,
+  },
+  sections = {
+    lualine_a = {'mode'},
+    lualine_b = {
+      {'branch', icon = '', color = {fg = '#50FA7B'}},
+      {'diff',
+        symbols = {added = ' ', modified = ' ', removed = ' '},
+        diff_color = {
+          added = {fg = '#50FA7B'},
+          modified = {fg = '#FFB86C'},
+          removed = {fg = '#FF5555'}
+        }
+      }
+    },
+    lualine_c = {
+      {'filename', path = 1, color = {fg = '#8BE9FD'}},
+      {'diagnostics',
+        sources = {'nvim_lsp'},
+        symbols = {error = ' ', warn = ' ', info = ' ', hint = ' '},
+        diagnostics_color = {
+          error = {fg = '#FF5555'},
+          warn = {fg = '#FFB86C'},
+          info = {fg = '#8BE9FD'},
+          hint = {fg = '#BD93F9'}
+        }
+      }
+    },
+    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_y = {'progress'},
+    lualine_z = {'location'}
   },
 })
 
 -- Telescope 확장 기능 설정
 require("telescope").setup({
   defaults = {
-    -- Dracula 색상과 어울리는 설정
+    -- Dracula Colorful 색상과 어울리는 설정
     prompt_prefix = " ",
     selection_caret = " ",
     sorting_strategy = "ascending",
     layout_config = {
       horizontal = {
         prompt_position = "top",
+        width = { padding = 0.15 },
+        height = { padding = 0.15 },
       },
     },
     -- Dracula 테마 색상
     color_devicons = true,
     borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+    set_env = { ["COLORTERM"] = "truecolor" },
+  },
+  -- Colorful 스타일의 하이라이팅 추가
+  highlights = {
+    TelescopePromptBorder = { fg = "#BD93F9" },
+    TelescopeResultsBorder = { fg = "#FF79C6" },
+    TelescopePreviewBorder = { fg = "#8BE9FD" },
+    TelescopeSelection = { bg = "#44475A", fg = "#F8F8F2" },
+    TelescopeSelectionCaret = { fg = "#FF79C6" },
+    TelescopeMultiSelection = { fg = "#50FA7B" },
+    TelescopeNormal = { bg = "#282A36" },
+    TelescopeMatching = { fg = "#FFB86C" },
   },
 })
 require("telescope").load_extension("file_browser")
