@@ -88,6 +88,9 @@ require("lazy").setup({
     build = "make tiktoken", -- MacOS/Linux에만 필요
     opts = {}, -- 기본 설정 사용
   },
+  { "folke/which-key.nvim", opts = {} },
+  { "b0o/schemastore.nvim" }, -- JSON 스키마 저장소
+  { "HiPhish/rainbow-delimiters.nvim" }, -- 괄호 색상 표시
 
   -- Flutter 개발용 플러그인
   {
@@ -236,6 +239,10 @@ vim.api.nvim_command("highlight SpecialKey guifg=#CCCCCC")
 vim.api.nvim_command("highlight Whitespace guifg=#444444") -- 탭, 공백 등 표시
 vim.api.nvim_command("highlight LineNr guifg=#AAAAAA") -- 라인 번호
 
+-- Indent-Blankline 하이라이팅 추가 (얇은 선을 위한 설정)
+vim.api.nvim_command("highlight IblIndent guifg=#3B4048 gui=nocombine")
+vim.api.nvim_command("highlight IblScope guifg=#BD93F9 gui=nocombine") -- 더 밝은 보라색으로 변경
+
 -- nvim-tree 초기화
 require("nvim-tree").setup({
   renderer = {
@@ -351,6 +358,7 @@ require("mason-lspconfig").setup({
     "rust_analyzer", -- Rust
     "clangd",        -- C/C++
     "marksman",      -- Markdown
+    "jsonls",        -- JSON
   },
   automatic_installation = true,
 })
@@ -421,6 +429,16 @@ lspconfig.clangd.setup({
 
 lspconfig.marksman.setup({
   capabilities = capabilities,
+})
+
+lspconfig.jsonls.setup({
+  capabilities = capabilities,
+  settings = {
+    json = {
+      schemas = require('schemastore').json.schemas(),
+      validate = { enable = true },
+    },
+  },
 })
 
 -- Flutter/Dart LSP 설정은 flutter-tools.nvim이 자동으로 설정함
@@ -720,7 +738,24 @@ require("illuminate").configure({
 })
 
 -- Indent Blankline 초기화
-require("ibl").setup()
+require("ibl").setup({
+  indent = {
+    char = "│",
+    tab_char = "│",
+    highlight = { "IblIndent" },
+  },
+  scope = {
+    enabled = true,
+    show_start = false,
+    show_end = false,
+    highlight = { "IblScope" },
+    priority = 500, -- 높은 우선순위로 스코프 선이 잘 보이도록
+  },
+  exclude = {
+    filetypes = { "help", "dashboard", "NvimTree", "Trouble", "lazy", "mason" },
+    buftypes = { "terminal", "nofile", "quickfix", "prompt" },
+  },
+})
 
 -- Autopairs 초기화
 require("nvim-autopairs").setup()
@@ -754,6 +789,17 @@ vim.keymap.set("n", "<leader>th", ":ToggleTerm direction=horizontal<CR>", { nore
 vim.keymap.set("n", "<leader>tv", ":ToggleTerm direction=vertical<CR>", { noremap = true, silent = true }) -- 세로 분할 터미널
 -- vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true }) -- 기존 ESC 매핑 비활성화
 vim.keymap.set("t", "<C-]>", "<C-\\><C-n>", { noremap = true, silent = true, desc = "터미널 모드 종료" }) -- 대체 키 매핑
+
+-- 파일 유형별 자동 포맷팅 설정
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "json", "jsonc" },
+  callback = function()
+    vim.keymap.set("n", "<leader>cf", function()
+      vim.lsp.buf.format({ async = false })
+      print("JSON 포맷팅 완료")
+    end, { buffer = true, desc = "JSON 포맷팅" })
+  end,
+})
 
 -- 터미널 크기 조절 단축키
 vim.keymap.set("n", "<leader>t+", ":lua require('toggleterm').resize(5)<CR>", { noremap = true, silent = true }) -- 터미널 크기 증가
@@ -835,6 +881,12 @@ vim.cmd [[
   augroup flutter_autosave
     autocmd!
     autocmd BufWritePost *.dart silent! :FlutterReload
+  augroup END
+
+  augroup json_settings
+    autocmd!
+    autocmd FileType json setlocal tabstop=2 shiftwidth=2
+    autocmd BufWritePre *.json lua vim.lsp.buf.format({ async = false })
   augroup END
 ]]
 
@@ -945,5 +997,92 @@ copilot_chat.setup({
       mapping = "<leader>cfd",
       description = "문서화 생성",
     },
+  },
+})
+
+-- rainbow-delimiters 설정
+local rainbow_delimiters = require('rainbow-delimiters')
+
+vim.g.rainbow_delimiters = {
+    strategy = {
+        [''] = rainbow_delimiters.strategy['global'],
+        vim = rainbow_delimiters.strategy['local'],
+    },
+    query = {
+        [''] = 'rainbow-delimiters',
+        lua = 'rainbow-blocks',
+    },
+    highlight = {
+        'RainbowDelimiterRed',
+        'RainbowDelimiterYellow',
+        'RainbowDelimiterBlue',
+        'RainbowDelimiterOrange',
+        'RainbowDelimiterGreen',
+        'RainbowDelimiterViolet',
+        'RainbowDelimiterCyan',
+    },
+    blacklist = {'html'},
+}
+
+-- 괄호를 얇게 표시하기 위한 하이라이팅 설정
+vim.cmd([[
+  hi RainbowDelimiterRed guifg=#FF5555 gui=NONE
+  hi RainbowDelimiterYellow guifg=#F1FA8C gui=NONE
+  hi RainbowDelimiterBlue guifg=#BD93F9 gui=NONE
+  hi RainbowDelimiterOrange guifg=#FFB86C gui=NONE
+  hi RainbowDelimiterGreen guifg=#50FA7B gui=NONE
+  hi RainbowDelimiterViolet guifg=#FF79C6 gui=NONE
+  hi RainbowDelimiterCyan guifg=#8BE9FD gui=NONE
+]])
+
+-- which-key 설정
+require("which-key").setup({
+  plugins = {
+    marks = true,
+    registers = true,
+    spelling = {
+      enabled = false,
+      suggestions = 20,
+    },
+    presets = {
+      operators = true,
+      motions = true,
+      text_objects = true,
+      windows = true,
+      nav = true,
+      z = true,
+      g = true,
+    },
+  },
+  icons = {
+    breadcrumb = "»", -- 경로 구분자 아이콘
+    separator = "➜", -- 그룹 구분자 아이콘
+    group = "+", -- 그룹 아이콘
+  },
+  popup_mappings = {
+    scroll_down = "<c-d>",
+    scroll_up = "<c-u>",
+  },
+  window = {
+    border = "rounded", -- rounded/single/double/shadow
+    position = "bottom",
+    margin = { 1, 0, 1, 0 },
+    padding = { 2, 2, 2, 2 },
+    winblend = 0, -- 투명도 (0-100)
+  },
+  layout = {
+    height = { min = 4, max = 25 },
+    width = { min = 20, max = 50 },
+    spacing = 3,
+    align = "center",
+  },
+  ignore_missing = false,
+  hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "call", "lua", "^:", "^ " },
+  show_help = true,
+  show_keys = true,
+  triggers = "auto",
+  triggers_blacklist = {
+    i = { "j", "k" },
+    v = { "j", "k" },
   },
 })
