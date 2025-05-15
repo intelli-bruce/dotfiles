@@ -11,8 +11,11 @@ return {
 
     font_size = 16.0,
 
-    default_prog = { "/bin/zsh", "-c", "/opt/homebrew/bin/tmux attach -t main || /opt/homebrew/bin/tmux new -s main" },
-
+    default_prog = {
+        "/bin/zsh",
+        "-c",
+        "/opt/homebrew/bin/tmux new-session -s wezterm_$(date +%s)"
+    },
 
     color_scheme = "Dracula",
     initial_rows = 30,
