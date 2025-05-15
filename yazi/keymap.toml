@@ -12,6 +12,22 @@ on = ["g", "l"]
 run = "plugin lazygit"
 desc = "Launch lazygit"
 
+# Quick directory navigation
+[[manager.prepend_keymap]]
+on = ["g", "r"]
+run = "cd /Users/brucechoe/Projects/Wespion/roomfit"
+desc = "Navigate to Roomfit project"
+
+[[manager.prepend_keymap]]
+on = ["g", "n"]
+run = "cd /Users/brucechoe/Projects/newscash"
+desc = "Navigate to Newscash project"
+
+[[manager.prepend_keymap]]
+on = ["g", "d"]
+run = "cd /Users/brucechoe/dotfiles"
+desc = "Navigate to dotfiles"
+
 # Default keybindings
 [[manager.prepend_keymap]]
 on   = ["<Esc>"]
