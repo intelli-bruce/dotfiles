@@ -35,6 +35,33 @@ echo "🔗 Linking Lazygit config..."
 mkdir -p "$HOME/.config/lazygit"
 ln -sf "$DOTFILES_DIR/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
 
+echo "🔗 Setting up LaunchAgents..."
+mkdir -p "$HOME/Library/LaunchAgents"
+ln -sf "$DOTFILES_DIR/launchd/com.tmux.start.plist" "$HOME/Library/LaunchAgents/com.tmux.start.plist"
+launchctl unload "$HOME/Library/LaunchAgents/com.tmux.start.plist" 2>/dev/null || true
+launchctl load "$HOME/Library/LaunchAgents/com.tmux.start.plist"
+
+echo "🔧 Installing tmux plugins..."
+# 플러그인 매니저 설치
+TMUX_TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [ ! -d "$TMUX_TPM_DIR" ]; then
+  echo "🔗 Installing tmux plugin manager..."
+  git clone https://github.com/tmux-plugins/tpm "$TMUX_TPM_DIR"
+fi
+
+# 필수 플러그인 설치
+TMUX_RESURRECT_DIR="$HOME/.tmux/plugins/tmux-resurrect"
+if [ ! -d "$TMUX_RESURRECT_DIR" ]; then
+  echo "🔗 Installing tmux-resurrect plugin..."
+  git clone https://github.com/tmux-plugins/tmux-resurrect "$TMUX_RESURRECT_DIR"
+fi
+
+TMUX_CONTINUUM_DIR="$HOME/.tmux/plugins/tmux-continuum"
+if [ ! -d "$TMUX_CONTINUUM_DIR" ]; then
+  echo "🔗 Installing tmux-continuum plugin..."
+  git clone https://github.com/tmux-plugins/tmux-continuum "$TMUX_CONTINUUM_DIR"
+fi
+
 echo "🔧 Installing Yazi plugins..."
 mkdir -p "$HOME/.config/yazi/plugins"
 # 이미 설치된 플러그인 확인
