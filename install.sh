@@ -35,6 +35,10 @@ echo "🔗 Linking Lazygit config..."
 mkdir -p "$HOME/.config/lazygit"
 ln -sf "$DOTFILES_DIR/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
 
+echo "🔗 Linking Hammerspoon config..."
+mkdir -p "$HOME/.hammerspoon"
+ln -sf "$DOTFILES_DIR/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
+
 echo "🔗 Setting up LaunchAgents..."
 mkdir -p "$HOME/Library/LaunchAgents"
 ln -sf "$DOTFILES_DIR/launchd/com.tmux.start.plist" "$HOME/Library/LaunchAgents/com.tmux.start.plist"
