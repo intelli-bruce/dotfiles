@@ -28,6 +28,11 @@ on = ["g", "d"]
 run = "cd /Users/brucechoe/dotfiles"
 desc = "Navigate to dotfiles"
 
+[[manager.prepend_keymap]]
+on = ["g", "p"]
+run = "cd /Users/brucechoe/Projects"
+desc = "Navigate to Projects directory"
+
 # Default keybindings
 [[manager.prepend_keymap]]
 on   = ["<Esc>"]
