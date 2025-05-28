@@ -5,17 +5,11 @@ local act = wezterm.action
 return {
     font = wezterm.font_with_fallback {
         'JetBrainsMono Nerd Font',
+        'Pretendard',
         'Apple SD Gothic Neo',
-        'D2Coding',
     },
 
     font_size = 16.0,
-
-    default_prog = {
-        "/bin/zsh",
-        "-c",
-        "/opt/homebrew/bin/tmux new-session -s wezterm_$(date +%s)"
-    },
 
     color_scheme = "Dracula",
     initial_rows = 30,
@@ -34,4 +28,44 @@ return {
 
     -- true color 지원
     enable_wayland = false,
+
+    -- 런처 메뉴 설정 (tmux 세션 포함)
+    launch_menu = {},
+
+    -- 키 바인딩
+    keys = {
+        -- vim 스타일 윈도우 이동
+        {
+            key = 'h',
+            mods = 'CMD|SHIFT',
+            action = act.ActivateWindowRelative(-1),  -- 이전 윈도우
+        },
+        {
+            key = 'l',
+            mods = 'CMD|SHIFT',
+            action = act.ActivateWindowRelative(1),   -- 다음 윈도우
+        },
+        -- 윈도우 인덱스로 직접 이동
+        {
+            key = '1',
+            mods = 'CMD|SHIFT',
+            action = act.ActivateWindow(0),
+        },
+        {
+            key = '2',
+            mods = 'CMD|SHIFT',
+            action = act.ActivateWindow(1),
+        },
+        {
+            key = '3',
+            mods = 'CMD|SHIFT',
+            action = act.ActivateWindow(2),
+        },
+        -- tmux 세션 선택
+        {
+            key = 't',
+            mods = 'CMD',
+            action = act.SendString 'tms\n',
+        },
+    },
 }
