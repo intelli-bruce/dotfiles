@@ -16,6 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `hammerspoon/init.lua`: Hammerspoon 자동화 도구 설정
 - `yazi/`: yazi 파일 매니저 설정
 - `lazygit/config.yml`: LazyGit GUI Git 클라이언트 설정
+- `claude/CLAUDE.md`: Claude Code를 위한 사용자 지침 파일
 
 ## 공통 작업 (Common Tasks)
 

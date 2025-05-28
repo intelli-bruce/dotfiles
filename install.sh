@@ -39,6 +39,10 @@ echo "🔗 Linking Hammerspoon config..."
 mkdir -p "$HOME/.hammerspoon"
 ln -sf "$DOTFILES_DIR/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
 
+echo "🔗 Linking Claude config..."
+mkdir -p "$HOME/.claude"
+ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
 echo "🔗 Setting up LaunchAgents..."
 mkdir -p "$HOME/Library/LaunchAgents"
 ln -sf "$DOTFILES_DIR/launchd/com.tmux.start.plist" "$HOME/Library/LaunchAgents/com.tmux.start.plist"
