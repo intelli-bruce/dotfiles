@@ -8,9 +8,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `install.sh`: 심볼릭 링크를 생성하여 설정 파일을 적절한 위치에 설치하는 스크립트
 - `wezterm/wezterm.lua`: WezTerm 터미널 에뮬레이터 설정
+- `tmux/tmux.conf`: tmux 터미널 멀티플렉서 설정
 - `nvim/init.lua`: Neovim 텍스트 에디터 설정
 - `karabiner/karabiner.json`: Karabiner-Elements 키 매핑 설정
 - `rectangle/RectangleConfig.json`: Rectangle 창 관리자 설정
+- `aerospace/aerospace.toml`: AeroSpace 윈도우 매니저 설정
+- `hammerspoon/init.lua`: Hammerspoon 자동화 도구 설정
+- `yazi/`: yazi 파일 매니저 설정
+- `lazygit/config.yml`: LazyGit GUI Git 클라이언트 설정
 
 ## 공통 작업 (Common Tasks)
 
@@ -32,10 +37,14 @@ dotfiles를 설치하려면 다음 명령어를 실행하세요:
 ## 설정 세부 정보 (Configuration Details)
 
 ### WezTerm (`wezterm/wezterm.lua`)
-- JetBrainsMono Nerd Font와 한글 폰트 지원
+- JetBrainsMono Nerd Font와 한글 폰트 지원 (Pretendard 추가)
 - Dracula 색상 테마
 - 창 투명도 및 블러 효과 설정
 - 한글 입력 개선 설정
+- 단축키:
+  - `Cmd+Shift+h/l`: vim 스타일 윈도우 이동
+  - `Cmd+Shift+1/2/3`: 윈도우 번호로 직접 이동
+  - `Cmd+t`: tmux 세션 선택 (tms 함수 실행)
 
 ### Neovim (`nvim/init.lua`)
 - lazy.nvim 플러그인 매니저 사용
@@ -51,3 +60,13 @@ dotfiles를 설치하려면 다음 명령어를 실행하세요:
 ### Rectangle (`rectangle/RectangleConfig.json`)
 - 창 위치 및 크기 조정을 위한 단축키 설정
 - 화면 분할 및 창 정렬 옵션
+
+### tmux (`tmux/tmux.conf`)
+- 프리픽스 키: `Ctrl+e`
+- vim 스타일 패널 이동 (`Ctrl+e h/j/k/l`)
+- 창 분할: `Ctrl+e |` (수직), `Ctrl+e -` (수평)
+- 세션 관리: `Ctrl+e s` (세션 목록)
+- resurrect와 continuum 플러그인으로 세션 자동 저장/복원
+
+### 추가 설정
+- **zsh 함수**: `tms` - fzf를 사용한 tmux 세션 선택기 (`.zshrc`에 추가 필요)
