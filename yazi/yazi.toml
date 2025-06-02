@@ -6,4 +6,8 @@ edit = [
   { run = 'nvim "$@"', block = true },
 ]
 
+[icons]
+# 아이콘 표시 비활성화
+enable = false
+
 # 기타 파일 타입에 대한 설정은 필요에 따라 추가할 수 있습니다

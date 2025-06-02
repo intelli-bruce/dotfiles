@@ -21,6 +21,7 @@ vim.opt.ignorecase = true -- 검색 시 대소문자 무시
 vim.opt.smartcase = true -- 대문자가 포함된 경우 대소문자 구분
 vim.opt.hlsearch = true -- 검색 결과 강조
 vim.opt.incsearch = true -- 증분 검색
+vim.opt.autoread = true -- 외부에서 파일이 변경되면 자동으로 다시 로드
 
 -- netrw 비활성화 (nvim-tree와 충돌 방지)
 vim.g.loaded_netrw = 1
@@ -91,6 +92,17 @@ require("lazy").setup({
   { "folke/which-key.nvim", opts = {} },
   { "b0o/schemastore.nvim" }, -- JSON 스키마 저장소
   { "HiPhish/rainbow-delimiters.nvim" }, -- 괄호 색상 표시
+  { 
+    "wfxr/minimap.vim", 
+    config = function()
+      vim.g.minimap_width = 10
+      vim.g.minimap_auto_start = 1
+      vim.g.minimap_auto_start_win_enter = 1
+      vim.g.minimap_highlight_range = 1
+      vim.g.minimap_highlight_search = 1
+      vim.g.minimap_git_colors = 1
+    end
+  }, -- 코드 미니맵 (IntelliJ처럼)
 
   -- Flutter 개발용 플러그인
   {
@@ -243,6 +255,10 @@ vim.api.nvim_command("highlight LineNr guifg=#AAAAAA") -- 라인 번호
 vim.api.nvim_command("highlight IblIndent guifg=#3B4048 gui=nocombine")
 vim.api.nvim_command("highlight IblScope guifg=#BD93F9 gui=nocombine") -- 더 밝은 보라색으로 변경
 
+-- minimap 관련 색상 설정 (Dracula 테마와 어울리게)
+vim.api.nvim_command("highlight MinimapCursor ctermfg=228 ctermbg=59 guifg=#F8F8F2 guibg=#6272A4")
+vim.api.nvim_command("highlight MinimapRange ctermfg=228 ctermbg=59 guifg=#F8F8F2 guibg=#44475A")
+
 -- nvim-tree 초기화
 require("nvim-tree").setup({
   renderer = {
@@ -301,6 +317,9 @@ require("lualine").setup({
 })
 
 -- Telescope 확장 기능 설정
+local telescopeActions = require("telescope.actions")
+local telescopeLayout = require("telescope.actions.layout")
+
 require("telescope").setup({
   defaults = {
     -- Dracula Colorful 색상과 어울리는 설정
@@ -310,14 +329,76 @@ require("telescope").setup({
     layout_config = {
       horizontal = {
         prompt_position = "top",
-        width = { padding = 0.15 },
-        height = { padding = 0.15 },
+        preview_width = 0.55, -- 미리보기 창 너비 (전체 너비의 55%)
+        results_width = 0.45, -- 결과 창 너비 (전체 너비의 45%)
+        width = { padding = 0.02 }, -- 전체 창 패딩 축소
+        height = { padding = 0.10 }, -- 전체 창 높이 패딩
+        preview_cutoff = 120, -- 이 값보다 화면이 좁으면 미리보기 창 숨김
       },
+      vertical = {
+        mirror = false,
+        preview_height = 0.6, -- 수직 레이아웃에서 미리보기 높이
+      },
+      width = 0.9, -- 전체 너비 (화면의 90%)
+      height = 0.85, -- 전체 높이 (화면의 85%)
+      preview_cutoff = 120, -- 미리보기 표시를 위한 최소 너비
     },
     -- Dracula 테마 색상
     color_devicons = true,
     borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
     set_env = { ["COLORTERM"] = "truecolor" },
+    -- 단축키 설정
+    mappings = {
+      i = {
+        -- 레이아웃 변경 단축키
+        ["<C-l>"] = function() require("telescope.actions.layout").cycle_layout_next() end,
+        -- 미리보기 창 토글
+        ["<C-p>"] = function() require("telescope.actions.layout").toggle_preview() end,
+        -- 창 크기 조절
+        ["<C-minus>"] = function() require("telescope.actions.layout").cycle_layout_prev() end,
+        ["<C-=>"] = function() require("telescope.actions.layout").cycle_layout_next() end,
+        -- 미리보기 창 스크롤
+        ["<C-d>"] = telescopeActions.preview_scrolling_down,
+        ["<C-u>"] = telescopeActions.preview_scrolling_up,
+      },
+      n = { -- 노멀 모드에서도 동일한 키매핑 제공
+        ["<C-l>"] = function() require("telescope.actions.layout").cycle_layout_next() end,
+        ["<C-p>"] = function() require("telescope.actions.layout").toggle_preview() end,
+        ["<C-minus>"] = function() require("telescope.actions.layout").cycle_layout_prev() end,
+        ["<C-=>"] = function() require("telescope.actions.layout").cycle_layout_next() end,
+        ["<C-d>"] = telescopeActions.preview_scrolling_down,
+        ["<C-u>"] = telescopeActions.preview_scrolling_up,
+      },
+    },
+  },
+  pickers = {
+    find_files = {
+      layout_strategy = "horizontal",
+      layout_config = {
+        preview_width = 0.6, -- 파일 검색 시 미리보기 창을 더 넓게
+      },
+    },
+    live_grep = {
+      layout_strategy = "horizontal",
+      layout_config = {
+        preview_width = 0.6, -- 텍스트 검색 시 미리보기 창을 더 넓게
+      },
+    },
+    buffers = {
+      layout_strategy = "horizontal",
+      layout_config = {
+        preview_width = 0.5, -- 버퍼 목록에서는 균등하게
+      },
+    },
+    -- 레이아웃 전환 기능 설정
+    layout_switcher = {
+      layouts = {
+        "horizontal",
+        "vertical", 
+        "flex", 
+        "cursor",
+      },
+    },
   },
   -- Colorful 스타일의 하이라이팅 추가
   highlights = {
@@ -431,11 +512,21 @@ lspconfig.marksman.setup({
   capabilities = capabilities,
 })
 
+-- ARB 파일을 위한 스키마 정의
+local arb_schema = {
+  fileMatch = { "*.arb" },
+  url = "https://raw.githubusercontent.com/google/flutter/master/dev/tools/localization/schema.json"
+}
+
 lspconfig.jsonls.setup({
   capabilities = capabilities,
+  filetypes = { "json", "jsonc", "arb" },
   settings = {
     json = {
-      schemas = require('schemastore').json.schemas(),
+      schemas = vim.list_extend(
+        require('schemastore').json.schemas(),
+        { arb_schema }
+      ),
       validate = { enable = true },
     },
   },
@@ -679,7 +770,7 @@ vim.keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { desc = "Q
 
 -- 추가 단축키 설정
 vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true, silent = true }) -- 탐색기 토글
-vim.keymap.set("n", "<C-p>", ":Telescope find_files<CR>", { noremap = true, silent = true }) -- 파일 검색
+vim.keymap.set("n", "<C-f>", ":Telescope find_files<CR>", { noremap = true, silent = true }) -- 파일 검색 (Ctrl+P에서 Ctrl+F로 변경)
 vim.keymap.set("n", "<leader>ff", ":Telescope find_files hidden=true no_ignore=true<CR>", { desc = "Find files (모든 파일 포함)" })
 vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Live grep" })
 vim.keymap.set("n", "<leader>fb", ":Telescope buffers<CR>", { desc = "Find buffers" })
@@ -807,6 +898,9 @@ vim.keymap.set("n", "<leader>t-", ":lua require('toggleterm').resize(-5)<CR>", {
 
 -- Yazi 파일 탐색기 단축키
 vim.keymap.set("n", "<leader>fe", ":ToggleTerm direction=float cmd=yazi<CR>", { desc = "Yazi 파일 탐색기 열기", noremap = true, silent = true })
+-- 미니맵 토글 단축키
+vim.keymap.set("n", "<leader>mm", ":MinimapToggle<CR>", { desc = "미니맵 토글", noremap = true, silent = true })
+
 -- Treesitter 설정
 require("nvim-treesitter.configs").setup({
   ensure_installed = {
@@ -888,12 +982,20 @@ vim.cmd [[
     autocmd FileType json setlocal tabstop=2 shiftwidth=2
     autocmd BufWritePre *.json lua vim.lsp.buf.format({ async = false })
   augroup END
+
+  augroup arb_settings
+    autocmd!
+    autocmd BufRead,BufNewFile *.arb set filetype=json
+    autocmd FileType arb setlocal tabstop=2 shiftwidth=2
+    autocmd BufWritePre *.arb lua vim.lsp.buf.format({ async = false })
+  augroup END
 ]]
 
 -- 기타 유용한 단축키
 vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "저장", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", { desc = "검색 강조 제거", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>r", ":checktime<CR>", { desc = "외부 변경 사항 확인", noremap = true, silent = true })
 -- ESC 키로 검색 하이라이팅 제거
 vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "검색 하이라이팅 제거", noremap = true, silent = true })
 
@@ -904,6 +1006,31 @@ vim.cmd([[
     autocmd InsertEnter * :nohlsearch
   augroup END
 ]])
+
+-- 파일 변경 감지 및 자동 로드 설정
+local auto_read_group = vim.api.nvim_create_augroup("AutoReadFileChanges", { clear = true })
+
+-- 포커스를 얻거나 버퍼로 이동할 때 변경 사항 확인
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  group = auto_read_group,
+  callback = function()
+    if vim.fn.mode() ~= 'c' and vim.fn.getcmdwintype() == '' then
+      vim.cmd('checktime')
+    end
+  end,
+  desc = "외부 파일 변경 사항 확인"
+})
+
+-- 파일이 외부에서 변경된 경우 알림
+vim.api.nvim_create_autocmd("FileChangedShellPost", {
+  group = auto_read_group,
+  callback = function()
+    vim.api.nvim_echo({
+      { "파일이 외부에서 변경되었습니다. 내용이 다시 로드되었습니다.", "WarningMsg" }
+    }, true, {})
+  end,
+  desc = "외부 파일 변경 알림"
+})
 vim.keymap.set("n", "<leader>/", "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", { desc = "주석 토글", noremap = true, silent = true })
 -- LazyGit 특별 설정 (ToggleTerm 사용)
 local lazygit_config = function()
