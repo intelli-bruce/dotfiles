@@ -1,55 +1,55 @@
 # Yazi keymap configuration file
 
 # File opening
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = ["e"]
 run  = "shell 'nvim $0'"
 desc = "Open file with Neovim"
 
 # LazyGit integration
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["g", "l"]
 run = "plugin lazygit"
 desc = "Launch lazygit"
 
 # Quick directory navigation
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["g", "r"]
 run = "cd /Users/brucechoe/Projects/Wespion/roomfit"
 desc = "Navigate to Roomfit project"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["g", "n"]
 run = "cd /Users/brucechoe/Projects/newscash"
 desc = "Navigate to Newscash project"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["g", "d"]
 run = "cd /Users/brucechoe/dotfiles"
 desc = "Navigate to dotfiles"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["g", "p"]
 run = "cd /Users/brucechoe/Projects"
 desc = "Navigate to Projects directory"
 
 # Default keybindings
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = ["<Esc>"]
 run  = "escape"
 desc = "Exit visual mode, clear selected, or cancel search"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = ["q"]
 run  = "quit"
 desc = "Exit the process"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = ["<C-q>"]
 run  = "close"
 desc = "Close the current tab, or quit if it is the last tab"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on   = ["<C-z>"]
 run  = "suspend"
 desc = "Suspend the process"

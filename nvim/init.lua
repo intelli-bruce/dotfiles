@@ -93,17 +93,18 @@ require("lazy").setup({
   { "folke/which-key.nvim", opts = {} },
   { "b0o/schemastore.nvim" }, -- JSON 스키마 저장소
   { "HiPhish/rainbow-delimiters.nvim" }, -- 괄호 색상 표시
-  { 
-    "wfxr/minimap.vim", 
-    config = function()
-      vim.g.minimap_width = 10
-      vim.g.minimap_auto_start = 1
-      vim.g.minimap_auto_start_win_enter = 1
-      vim.g.minimap_highlight_range = 1
-      vim.g.minimap_highlight_search = 1
-      vim.g.minimap_git_colors = 1
-    end
-  }, -- 코드 미니맵 (IntelliJ처럼)
+  -- minimap.vim 제거 (code-minimap 바이너리 필요)
+  -- { 
+  --   "wfxr/minimap.vim", 
+  --   config = function()
+  --     vim.g.minimap_width = 10
+  --     vim.g.minimap_auto_start = 1
+  --     vim.g.minimap_auto_start_win_enter = 1
+  --     vim.g.minimap_highlight_range = 1
+  --     vim.g.minimap_highlight_search = 1
+  --     vim.g.minimap_git_colors = 1
+  --   end
+  -- },
 
   -- Flutter 개발용 플러그인
   {
@@ -144,7 +145,7 @@ require("lazy").setup({
             vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = bufnr })
             vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = bufnr })
             -- 이 함수가 LSP가 연결될 때 호출됩니다
-            print("Flutter LSP connected!")
+            -- print("Flutter LSP connected!") -- 로그 메시지 비활성화
           end,
           capabilities = require("cmp_nvim_lsp").default_capabilities(),
           settings = {
@@ -211,7 +212,7 @@ require("lazy").setup({
       end
 
       -- 로더 실행 시 Flutter 관련 플러그인 설치 확인 메시지 출력
-      print("Flutter Tools 플러그인이 로드되었습니다.")
+      -- print("Flutter Tools 플러그인이 로드되었습니다.") -- 한글 깨짐 방지
     end,
   },
   { "mfussenegger/nvim-dap" },
@@ -1142,8 +1143,8 @@ vim.keymap.set("n", "<leader>t-", ":lua require('toggleterm').resize(-5)<CR>", {
 
 -- Yazi 파일 탐색기 단축키
 vim.keymap.set("n", "<leader>fe", ":ToggleTerm direction=float cmd=yazi<CR>", { desc = "Yazi 파일 탐색기 열기", noremap = true, silent = true })
--- 미니맵 토글 단축키
-vim.keymap.set("n", "<leader>mm", ":MinimapToggle<CR>", { desc = "미니맵 토글", noremap = true, silent = true })
+-- 미니맵 토글 단축키 (minimap.vim 비활성화)
+-- vim.keymap.set("n", "<leader>mm", ":MinimapToggle<CR>", { desc = "미니맵 토글", noremap = true, silent = true })
 
 -- Treesitter 설정
 require("nvim-treesitter.configs").setup({
