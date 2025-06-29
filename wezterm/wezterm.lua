@@ -19,6 +19,17 @@ return {
     window_background_opacity = 0.85,  -- 투명도
     macos_window_background_blur = 20, -- 아크릴 블러 (macOS 한정)
 
+    -- Window padding 추가 (tmux 테두리가 잘리지 않도록)
+    window_padding = {
+        left = 10,
+        right = 10,
+        top = 10,
+        bottom = 10,
+    },
+
+    -- Line height 조정 (테두리 연결 개선)
+    line_height = 1.0,
+
     -- 한글 입력 개선
     use_ime = true,
     enable_kitty_keyboard = true, -- 일부 조합 이슈 해결
