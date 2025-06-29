@@ -80,6 +80,7 @@ require("lazy").setup({
   { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
   { "github/copilot.vim" }, -- GitHub Copilot
+  { "sindrets/diffview.nvim", dependencies = "nvim-lua/plenary.nvim" }, -- Git diff 뷰어
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     dependencies = {
@@ -273,7 +274,90 @@ require("nvim-tree").setup({
   -- Dracula 테마에 맞는 색상 설정
   git = {
     ignore = false,
+    enable = true,
+    show_on_dirs = true,
+    show_on_open_dirs = true,
   },
+  -- 새로운 API를 사용한 자동 열기 설정
+  on_attach = function(bufnr)
+    local api = require("nvim-tree.api")
+    
+    -- 기본 매핑을 먼저 적용
+    api.config.mappings.default_on_attach(bufnr)
+    
+    -- Git diff 관련 커스텀 키맵 추가
+    local function opts(desc)
+      return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+    end
+    
+    -- Git diff 보기 (수직 분할)
+    vim.keymap.set('n', 'gd', function()
+      local node = api.tree.get_node_under_cursor()
+      if node and node.type == "file" then
+        vim.cmd("wincmd l") -- 오른쪽 창으로 이동 (없으면 새로 생성)
+        vim.cmd("e " .. node.absolute_path)
+        vim.cmd("Gvdiffsplit")
+      end
+    end, opts('Git Diff (수직 분할)'))
+    
+    -- Git diff 보기 (플로팅 창)
+    vim.keymap.set('n', 'gD', function()
+      local node = api.tree.get_node_under_cursor()
+      if node and node.type == "file" then
+        vim.cmd("DiffviewOpen -- " .. node.absolute_path)
+      end
+    end, opts('Git Diff (Diffview)'))
+    
+    -- Git 상태 미리보기
+    vim.keymap.set('n', 'gs', function()
+      local node = api.tree.get_node_under_cursor()
+      if node and node.type == "file" then
+        vim.cmd("wincmd l")
+        vim.cmd("e " .. node.absolute_path)
+        vim.cmd("Gitsigns preview_hunk")
+      end
+    end, opts('Git 변경 사항 미리보기'))
+    
+    -- Git blame 보기
+    vim.keymap.set('n', 'gb', function()
+      local node = api.tree.get_node_under_cursor()
+      if node and node.type == "file" then
+        vim.cmd("wincmd l")
+        vim.cmd("e " .. node.absolute_path)
+        vim.cmd("Gitsigns toggle_current_line_blame")
+      end
+    end, opts('Git Blame 토글'))
+  end,
+  -- Git 상태 표시를 위한 하이라이트 그룹
+  renderer = {
+    highlight_git = true,
+    icons = {
+      glyphs = {
+        git = {
+          unstaged = "✗",
+          staged = "✓",
+          unmerged = "",
+          renamed = "➜",
+          untracked = "★",
+          deleted = "",
+          ignored = "◌",
+        },
+      },
+    },
+  },
+})
+
+-- nvim 시작 시 자동으로 nvim-tree 열기
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function(data)
+    -- 디렉토리가 아니거나 파일이 열린 경우에만 nvim-tree 열기
+    local directory = vim.fn.isdirectory(data.file) == 1
+    
+    if not directory then
+      require("nvim-tree.api").tree.open()
+    end
+  end,
+  once = true,
 })
 
 -- 상태바 초기화 (Dracula Colorful 스타일)
@@ -784,6 +868,159 @@ require("Comment").setup({
   },
 })
 
+-- Diffview 설정 (Git diff 뷰어)
+require("diffview").setup({
+  diff_binaries = false,
+  enhanced_diff_hl = false,
+  git_cmd = { "git" },
+  use_icons = true,
+  icons = {
+    folder_closed = "",
+    folder_open = "",
+  },
+  signs = {
+    fold_closed = "",
+    fold_open = "",
+    done = "✓",
+  },
+  view = {
+    default = {
+      layout = "diff2_horizontal",
+    },
+    merge_tool = {
+      layout = "diff3_horizontal",
+      disable_diagnostics = true,
+    },
+    file_history = {
+      layout = "diff2_horizontal",
+    },
+  },
+  file_panel = {
+    listing_style = "tree",
+    tree_options = {
+      flatten_dirs = true,
+      folder_statuses = "only_folded",
+    },
+    win_config = {
+      position = "left",
+      width = 35,
+    },
+  },
+  file_history_panel = {
+    log_options = {
+      git = {
+        single_file = {
+          diff_merges = "combined",
+        },
+        multi_file = {
+          diff_merges = "first-parent",
+        },
+      },
+    },
+    win_config = {
+      position = "bottom",
+      height = 16,
+    },
+  },
+  keymaps = {
+    disable_defaults = false,
+    view = {
+      ["<tab>"]      = false,
+      ["<s-tab>"]    = false,
+      ["gf"]         = false,
+      ["<C-w><C-f>"] = false,
+      ["<C-w>gf"]    = false,
+      ["<leader>e"]  = false,
+      ["<leader>b"]  = false,
+      ["<leader>co"] = false,
+      ["<leader>ct"] = false,
+      ["<leader>cb"] = false,
+      ["<leader>ca"] = false,
+      ["<leader>dO"] = false,
+      ["<leader>da"] = false,
+      ["<leader>dw"] = false,
+      ["<leader>du"] = false,
+    },
+    diff1 = {
+      ["g?"] = false,
+    },
+    diff2 = {
+      ["g?"] = false,
+    },
+    diff3 = {
+      ["g?"] = false,
+    },
+    diff4 = {
+      ["g?"] = false,
+    },
+    file_panel = {
+      ["j"]          = false,
+      ["<down>"]     = false,
+      ["k"]          = false,
+      ["<up>"]       = false,
+      ["<cr>"]       = false,
+      ["o"]          = false,
+      ["<2-LeftMouse>"] = false,
+      ["-"]          = false,
+      ["s"]          = false,
+      ["S"]          = false,
+      ["U"]          = false,
+      ["R"]          = false,
+      ["<tab>"]      = false,
+      ["<s-tab>"]    = false,
+      ["gf"]         = false,
+      ["<C-w><C-f>"] = false,
+      ["<C-w>gf"]    = false,
+      ["i"]          = false,
+      ["f"]          = false,
+      ["<c-u>"]      = false,
+      ["<c-d>"]      = false,
+      ["<leader>e"]  = false,
+      ["<leader>b"]  = false,
+      ["<leader>co"] = false,
+      ["<leader>ct"] = false,
+      ["<leader>cb"] = false,
+      ["<leader>ca"] = false,
+      ["<leader>dO"] = false,
+      ["<leader>da"] = false,
+      ["<leader>du"] = false,
+      ["g?"]         = false,
+    },
+    file_history_panel = {
+      ["g!"]         = false,
+      ["<C-A-d>"]    = false,
+      ["<C-c>q"]     = false,
+      ["<C-c><C-q>"] = false,
+      ["<C-c>w"]     = false,
+      ["<C-c><C-w>"] = false,
+      ["y"]          = false,
+      ["Y"]          = false,
+      ["O"]          = false,
+      ["<tab>"]      = false,
+      ["<s-tab>"]    = false,
+      ["gf"]         = false,
+      ["<C-w><C-f>"] = false,
+      ["<C-w>gf"]    = false,
+      ["<leader>e"]  = false,
+      ["<leader>b"]  = false,
+      ["<leader>co"] = false,
+      ["<leader>ct"] = false,
+      ["<leader>cb"] = false,
+      ["<leader>ca"] = false,
+      ["<leader>dO"] = false,
+      ["<leader>da"] = false,
+      ["g?"]         = false,
+    },
+    option_panel = {
+      ["<tab>"] = false,
+      ["q"]     = false,
+      ["o"]     = false,
+      ["<cr>"]  = false,
+      ["?"]     = false,
+    },
+  },
+})
+
 -- GitSigns 초기화
 require("gitsigns").setup({
   signs = {
@@ -880,6 +1117,13 @@ vim.keymap.set("n", "<leader>th", ":ToggleTerm direction=horizontal<CR>", { nore
 vim.keymap.set("n", "<leader>tv", ":ToggleTerm direction=vertical<CR>", { noremap = true, silent = true }) -- 세로 분할 터미널
 -- vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true }) -- 기존 ESC 매핑 비활성화
 vim.keymap.set("t", "<C-]>", "<C-\\><C-n>", { noremap = true, silent = true, desc = "터미널 모드 종료" }) -- 대체 키 매핑
+
+-- Diffview 단축키 설정
+vim.keymap.set("n", "<leader>do", ":DiffviewOpen<CR>", { desc = "Diffview 열기" })
+vim.keymap.set("n", "<leader>dc", ":DiffviewClose<CR>", { desc = "Diffview 닫기" })
+vim.keymap.set("n", "<leader>dh", ":DiffviewFileHistory %<CR>", { desc = "현재 파일 히스토리" })
+vim.keymap.set("n", "<leader>dH", ":DiffviewFileHistory<CR>", { desc = "전체 히스토리" })
+vim.keymap.set("n", "<leader>dt", ":DiffviewToggleFiles<CR>", { desc = "파일 패널 토글" })
 
 -- 파일 유형별 자동 포맷팅 설정
 vim.api.nvim_create_autocmd("FileType", {
