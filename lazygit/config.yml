@@ -1,4 +1,18 @@
 # Lazygit 설정
+git:
+  paging:
+    colorArg: always
+    pager: delta --paging=never --side-by-side --line-numbers
+    useConfig: false
+
+keybinding:
+  universal:
+    prevBlock-alt: 'h'  # 이전 블록으로 이동 (alt+h)
+    nextBlock-alt: 'l'  # 다음 블록으로 이동 (alt+l)
+  files:
+    prevHunk: 'h'  # 이전 hunk로 이동
+    nextHunk: 'l'  # 다음 hunk로 이동
+
 gui:
   theme:
     activeBorderColor:

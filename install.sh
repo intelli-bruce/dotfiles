@@ -32,8 +32,8 @@ mkdir -p "$HOME/.config/aerospace"
 ln -sf "$DOTFILES_DIR/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
 
 echo "🔗 Linking Lazygit config..."
-mkdir -p "$HOME/.config/lazygit"
-ln -sf "$DOTFILES_DIR/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
+mkdir -p "$HOME/Library/Application Support/lazygit"
+ln -sf "$DOTFILES_DIR/lazygit/config.yml" "$HOME/Library/Application Support/lazygit/config.yml"
 
 echo "🔗 Linking Hammerspoon config..."
 mkdir -p "$HOME/.hammerspoon"
@@ -76,6 +76,37 @@ mkdir -p "$HOME/.config/yazi/plugins"
 if [ ! -d "$HOME/.config/yazi/plugins/lazygit.yazi" ]; then
   echo "🔗 Installing lazygit plugin for Yazi..."
   git clone https://github.com/Lil-Dank/lazygit.yazi.git "$HOME/.config/yazi/plugins/lazygit.yazi"
+fi
+
+echo "🔗 Linking zsh configuration..."
+ln -sf "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
+ln -sf "$DOTFILES_DIR/zsh/zprofile" "$HOME/.zprofile"
+if [ -f "$DOTFILES_DIR/zsh/p10k.zsh" ]; then
+  ln -sf "$DOTFILES_DIR/zsh/p10k.zsh" "$HOME/.p10k.zsh"
+fi
+
+echo "🔧 Installing Oh My Zsh and plugins..."
+# Install Oh My Zsh if not already installed
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "🔗 Installing Oh My Zsh..."
+  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+
+# Install Powerlevel10k theme
+if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
+  echo "🔗 Installing Powerlevel10k theme..."
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+fi
+
+# Install zsh plugins
+if [ ! -d "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ]; then
+  echo "🔗 Installing zsh-autosuggestions..."
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+fi
+
+if [ ! -d "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ]; then
+  echo "🔗 Installing zsh-syntax-highlighting..."
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 fi
 
 echo "✅ All config files linked!"

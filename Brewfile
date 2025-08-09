@@ -5,7 +5,6 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "d12frosted/emacs"
-tap "felixkratz/formulae" # for aerospace
 
 # CLI 도구
 brew "git"       # 버전 관리 시스템
@@ -26,12 +25,8 @@ brew "tree-sitter" # 코드 파싱 라이브러리
 brew "postgresql@15" # PostgreSQL 데이터베이스
 brew "node"      # Node.js
 brew "python@3.13" # Python 3.13
-brew "scrcpy"    # 안드로이드 화면 미러링
-brew "aerospace" # 윈도우 매니저 (macOS용)
 
 # 추가 CLI 도구 (선택사항)
-brew "ffmpeg"      # 미디어 처리 도구
-brew "imagemagick" # 이미지 처리 도구
 brew "uv"          # Python 패키지 관리자
 
 # 개발 툴

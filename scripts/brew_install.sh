@@ -12,11 +12,11 @@ if ! command -v brew &> /dev/null; then
   # Homebrew PATH 설정 (zsh 기준)
   if [[ $(uname -m) == 'arm64' ]]; then
     # M1/M2 Mac
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
   else
     # Intel Mac
-    echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zshrc
+    echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
     eval "$(/usr/local/bin/brew shellenv)"
   fi
   
