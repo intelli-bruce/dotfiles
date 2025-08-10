@@ -42,6 +42,11 @@ ln -sf "$DOTFILES_DIR/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
 echo "🔗 Linking Claude config..."
 mkdir -p "$HOME/.claude"
 ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+ln -sf "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
+
+# statusline 스크립트에 실행 권한 부여
+chmod +x "$DOTFILES_DIR/claude/statusline-command.sh"
 
 echo "🔗 Setting up LaunchAgents..."
 mkdir -p "$HOME/Library/LaunchAgents"

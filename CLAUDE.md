@@ -16,7 +16,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `hammerspoon/init.lua`: Hammerspoon 자동화 도구 설정
 - `yazi/`: yazi 파일 매니저 설정
 - `lazygit/config.yml`: LazyGit GUI Git 클라이언트 설정
-- `claude/CLAUDE.md`: Claude Code를 위한 사용자 지침 파일
+- `claude/`: Claude Code 설정 파일들
+  - `CLAUDE.md`: 사용자 지침 파일
+  - `settings.json`: Claude Code 메인 설정 파일
+  - `statusline-command.sh`: 맞춤형 상태바 스크립트
 
 ## 공통 작업 (Common Tasks)
 
@@ -68,6 +71,16 @@ dotfiles를 설치하려면 다음 명령어를 실행하세요:
 - 창 분할: `Ctrl+e |` (수직), `Ctrl+e -` (수평)
 - 세션 관리: `Ctrl+e s` (세션 목록)
 - resurrect와 continuum 플러그인으로 세션 자동 저장/복원
+
+### Claude Code (`claude/`)
+- **설정 파일**: `settings.json` - Claude Code 메인 설정 파일
+- **상태바 스크립트**: `statusline-command.sh` - 맞춤형 상태바 표시
+  - 사용자@호스트명 표시
+  - 현재 디렉터리 (프로젝트 루트 기준 상대 경로)
+  - Git 브랜치 및 상태 (clean/dirty)  
+  - Claude 모델명
+  - 세션 메트릭스 (토큰 수, 메시지 수, 세션 시간)
+- **알림 설정**: 작업 완료 시 시스템 사운드 재생
 
 ### 추가 설정
 - **zsh 함수**: `tms` - fzf를 사용한 tmux 세션 선택기 (`.zshrc`에 추가 필요)
