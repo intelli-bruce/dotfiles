@@ -1,0 +1,258 @@
+{
+    "title": "Korean IME Smart Switch for Vim/tmux",
+    "rules": [
+        {
+            "description": "ESC key switches to English (for Vim/tmux Normal mode)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "escape"
+                    },
+                    "to": [
+                        {
+                            "key_code": "escape"
+                        }
+                    ],
+                    "to_after_key_up": [
+                        {
+                            "select_input_source": {
+                                "language": "^en$"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Right Command tap to switch between Korean/English",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "right_command",
+                        "modifiers": {
+                            "optional": ["any"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "right_command",
+                            "lazy": true
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "f18"
+                        }
+                    ],
+                    "to_if_held_down": [
+                        {
+                            "key_code": "right_command"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "input_source_if",
+                            "input_sources": [
+                                {
+                                    "language": "^ko$"
+                                }
+                            ]
+                        }
+                    ],
+                    "parameters": {
+                        "basic.to_if_held_down_threshold_milliseconds": 100
+                    }
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "right_command",
+                        "modifiers": {
+                            "optional": ["any"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "right_command",
+                            "lazy": true
+                        }
+                    ],
+                    "to_if_alone": [
+                        {
+                            "key_code": "f18"
+                        }
+                    ],
+                    "to_if_held_down": [
+                        {
+                            "key_code": "right_command"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "input_source_if",
+                            "input_sources": [
+                                {
+                                    "language": "^en$"
+                                }
+                            ]
+                        }
+                    ],
+                    "parameters": {
+                        "basic.to_if_held_down_threshold_milliseconds": 100
+                    }
+                }
+            ]
+        },
+        {
+            "description": "Ctrl+[ switches to English (alternative ESC)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "open_bracket",
+                        "modifiers": {
+                            "mandatory": ["control"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "escape"
+                        },
+                        {
+                            "select_input_source": {
+                                "language": "^en$"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Alt/Cmd shortcuts work regardless of IME state",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "any": "key_code",
+                        "modifiers": {
+                            "mandatory": ["option"]
+                        }
+                    },
+                    "conditions": [
+                        {
+                            "type": "input_source_if",
+                            "input_sources": [
+                                {
+                                    "language": "^ko$"
+                                }
+                            ]
+                        }
+                    ],
+                    "to": [
+                        {
+                            "select_input_source": {
+                                "language": "^en$"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Auto-switch to English for Vim commands (: / ?)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "semicolon",
+                        "modifiers": {
+                            "mandatory": ["shift"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "semicolon",
+                            "modifiers": ["shift"]
+                        },
+                        {
+                            "select_input_source": {
+                                "language": "^en$"
+                            }
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$",
+                                "^com\\.googlecode\\.iterm2$",
+                                "^io\\.alacritty$"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "slash"
+                    },
+                    "to": [
+                        {
+                            "key_code": "slash"
+                        },
+                        {
+                            "select_input_source": {
+                                "language": "^en$"
+                            }
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$",
+                                "^com\\.googlecode\\.iterm2$",
+                                "^io\\.alacritty$"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "slash",
+                        "modifiers": {
+                            "mandatory": ["shift"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "slash",
+                            "modifiers": ["shift"]
+                        },
+                        {
+                            "select_input_source": {
+                                "language": "^en$"
+                            }
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$",
+                                "^com\\.googlecode\\.iterm2$",
+                                "^io\\.alacritty$"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

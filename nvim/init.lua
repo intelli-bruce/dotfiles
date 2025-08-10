@@ -27,6 +27,25 @@ vim.opt.autoread = true -- 외부에서 파일이 변경되면 자동으로 다�
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- 한글 입력 자동 전환 설정 (macOS)
+if vim.fn.has('mac') == 1 then
+  -- Insert mode 진입 시 이전 입력 소스 저장
+  vim.api.nvim_create_autocmd({"InsertEnter"}, {
+    pattern = "*",
+    callback = function()
+      vim.b.ime_status = vim.fn.system("osascript -e 'tell application \"System Events\" to get the name of the current input source'")
+    end
+  })
+  
+  -- Insert mode 벗어날 때 영문으로 전환
+  vim.api.nvim_create_autocmd({"InsertLeave"}, {
+    pattern = "*",
+    callback = function()
+      os.execute("osascript -e 'tell application \"System Events\" to select input source \"ABC\"' &")
+    end
+  })
+end
+
 -- lazy.nvim 플러그인 매니저 설정
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
