@@ -45,6 +45,10 @@ return {
     -- 런처 메뉴 설정
     launch_menu = {},
 
+    -- macOS에서 Option 키를 Meta 키로 사용
+    send_composed_key_when_left_alt_is_pressed = false,
+    send_composed_key_when_right_alt_is_pressed = false,
+    
     -- 키 바인딩
     keys = {
         -- vim 스타일 윈도우 이동
