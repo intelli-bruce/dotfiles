@@ -11,6 +11,11 @@ fi
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# Ctrl+d 실수 방지 - 10번 눌러야 종료
+export IGNOREEOF=10
+# Ctrl+d 경고 메시지
+setopt IGNORE_EOF
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
