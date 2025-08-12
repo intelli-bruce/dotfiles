@@ -4,6 +4,8 @@ git:
     colorArg: always
     pager: delta --paging=never --side-by-side --line-numbers
     useConfig: false
+  log:
+    showWholeGraph: true  # 모든 브랜치를 그래프에 표시
 
 keybinding:
   universal:
