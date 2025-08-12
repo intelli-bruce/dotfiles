@@ -42,6 +42,10 @@ ln -sf "$DOTFILES_DIR/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
 echo "🔗 Linking Claude config..."
 mkdir -p "$HOME/.claude"
 ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
+echo "🔗 Linking Karabiner complex modifications..."
+mkdir -p "$HOME/.config/karabiner/assets/complex_modifications"
+ln -sf "$DOTFILES_DIR/karabiner/korean-ime-fix.json" "$HOME/.config/karabiner/assets/complex_modifications/korean-ime-fix.json"
 ln -sf "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 

@@ -161,6 +161,42 @@
             ]
         },
         {
+            "description": "Alt+a switches to English and enters tmux copy mode",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "a",
+                        "modifiers": {
+                            "mandatory": ["option"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "select_input_source": {
+                                "language": "^en$"
+                            }
+                        },
+                        {
+                            "key_code": "a",
+                            "modifiers": ["option"]
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$",
+                                "^com\\.googlecode\\.iterm2$",
+                                "^io\\.alacritty$"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "description": "Auto-switch to English for Vim commands (: / ?)",
             "manipulators": [
                 {
