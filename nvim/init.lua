@@ -61,7 +61,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- 플러그인 설치 목록
 require("lazy").setup({
-  { "dracula/vim", name = "dracula", priority = 1000 },
+  -- { "dracula/vim", name = "dracula", priority = 1000 },  -- 기본 dracula 대신 커스텀 사용
   { "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" } },
   { "nvim-lualine/lualine.nvim" },
   {
@@ -243,7 +243,9 @@ require("lazy").setup({
 })
 
 -- 색상 테마 적용 (Dracula Colorful 스타일)
-vim.cmd.colorscheme "dracula"
+-- vim.cmd.colorscheme "dracula"  -- 기본 dracula 대신 커스텀 사용
+-- Dracula Colorful 테마 적용 (IntelliJ IDEA 스타일)
+require("dracula-colorful").setup()
 
 -- Dracula Colorful 스타일을 위한 추가 하이라이팅 설정
 -- 기본 텍스트 색상을 약간 더 어둡게 변경 (#F8F8F2 -> #E6E6E6)
@@ -282,6 +284,13 @@ vim.api.nvim_command("highlight MinimapRange ctermfg=228 ctermbg=59 guifg=#F8F8F
 
 -- nvim-tree 초기화
 require("nvim-tree").setup({
+  view = {
+    width = 40,  -- 패널 너비 설정 (기본값: 30)
+    side = "left",  -- 패널 위치
+    preserve_window_proportions = false,
+    number = false,
+    relativenumber = false,
+  },
   renderer = {
     icons = {
       show = {
@@ -383,7 +392,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 -- 상태바 초기화 (Dracula Colorful 스타일)
 require("lualine").setup({
   options = {
-    theme = 'dracula',
+    theme = 'auto',  -- 커스텀 테마에 맞춰 자동 조정
     component_separators = { left = '', right = '' },
     section_separators = { left = '', right = '' },
     globalstatus = true,
@@ -1200,10 +1209,17 @@ vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "창 위로 이동" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "창 오른쪽으로 이동" })
 
 -- 창 크기 조절 단축키
-vim.keymap.set("n", "<A-h>", ":vertical resize -2<CR>", { desc = "창 가로 크기 줄이기" })
-vim.keymap.set("n", "<A-j>", ":resize +2<CR>", { desc = "창 세로 크기 늘리기" })
-vim.keymap.set("n", "<A-k>", ":resize -2<CR>", { desc = "창 세로 크기 줄이기" })
-vim.keymap.set("n", "<A-l>", ":vertical resize +2<CR>", { desc = "창 가로 크기 늘리기" })
+vim.keymap.set("n", "<C-Left>", ":vertical resize -3<CR>", { desc = "창 너비 줄이기", silent = true })
+vim.keymap.set("n", "<C-Right>", ":vertical resize +3<CR>", { desc = "창 너비 늘리기", silent = true })
+vim.keymap.set("n", "<C-Up>", ":resize +3<CR>", { desc = "창 높이 늘리기", silent = true })
+vim.keymap.set("n", "<C-Down>", ":resize -3<CR>", { desc = "창 높이 줄이기", silent = true })
+
+-- Leader 키를 사용한 대체 단축키 (tmux와 충돌 방지)
+vim.keymap.set("n", "<leader>wh", ":vertical resize -5<CR>", { desc = "창 너비 줄이기", silent = true })
+vim.keymap.set("n", "<leader>wl", ":vertical resize +5<CR>", { desc = "창 너비 늘리기", silent = true })
+vim.keymap.set("n", "<leader>wk", ":resize +5<CR>", { desc = "창 높이 늘리기", silent = true })
+vim.keymap.set("n", "<leader>wj", ":resize -5<CR>", { desc = "창 높이 줄이기", silent = true })
+vim.keymap.set("n", "<leader>w=", "<C-w>=", { desc = "모든 창 크기 동일하게", silent = true })
 
 -- 버퍼 관리 단축키
 vim.keymap.set("n", "<S-h>", ":bprevious<CR>", { desc = "이전 버퍼" })

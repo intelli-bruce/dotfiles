@@ -7,7 +7,9 @@ ln -sf "$DOTFILES_DIR/wezterm/wezterm.lua" "$HOME/.wezterm.lua"
 
 echo "🔗 Linking Neovim config..."
 mkdir -p "$HOME/.config/nvim"
+mkdir -p "$HOME/.config/nvim/lua"
 ln -sf "$DOTFILES_DIR/nvim/init.lua" "$HOME/.config/nvim/init.lua"
+ln -sf "$DOTFILES_DIR/nvim/lua/dracula-colorful.lua" "$HOME/.config/nvim/lua/dracula-colorful.lua"
 
 echo "🔗 Linking Karabiner config..."
 mkdir -p "$HOME/.config/karabiner"

@@ -24,12 +24,12 @@ return {
     window_background_opacity = 0.85,
     macos_window_background_blur = 20,
 
-    -- Window padding
+    -- Window padding (모든 패딩 제거)
     window_padding = {
-        left = 10,
-        right = 10,
-        top = 10,
-        bottom = 10,
+        left = 0,
+        right = 0,
+        top = 0,
+        bottom = 0,
     },
 
     -- Line height
