@@ -24,12 +24,12 @@ return {
     window_background_opacity = 0.85,
     macos_window_background_blur = 20,
 
-    -- Window padding (모든 패딩 제거)
+    -- Window padding (상단과 좌우에 패딩 추가)
     window_padding = {
-        left = 0,
-        right = 0,
-        top = 0,
-        bottom = 0,
+        left = 10,   -- 좌측 패딩 (15 → 10)
+        right = 10,  -- 우측 패딩 (15 → 10)
+        top = 10,    -- 상단 패딩
+        bottom = 0,  -- 하단은 패딩 없음
     },
 
     -- Line height
