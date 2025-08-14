@@ -98,12 +98,61 @@ require("lazy").setup({
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
   { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
-  { "github/copilot.vim" }, -- GitHub Copilot
+  -- { "github/copilot.vim" }, -- 기존 VimScript 버전 (비활성화)
+  {
+    "zbirenbaum/copilot.lua",  -- 더 빠른 Lua 버전으로 업그레이드
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      require("copilot").setup({
+        suggestion = {
+          enabled = true,
+          auto_trigger = true,  -- 자동으로 제안 표시
+          hide_during_completion = true,  -- nvim-cmp 열릴 때 숨김
+          debounce = 75,
+          keymap = {
+            accept = "<C-J>",  -- 기존 키맵 유지
+            accept_word = false,
+            accept_line = false,
+            next = "<C-L>",    -- 기존 키맵 유지
+            prev = "<C-H>",    -- 기존 키맵 유지
+            dismiss = "<C-]>",
+          },
+        },
+        panel = {
+          enabled = true,
+          auto_refresh = false,
+          keymap = {
+            jump_prev = "[[",
+            jump_next = "]]",
+            accept = "<CR>",
+            refresh = "gr",
+            open = "<M-CR>"
+          },
+          layout = {
+            position = "bottom",
+            ratio = 0.4
+          },
+        },
+        filetypes = {
+          ["*"] = true,  -- 모든 파일 타입에서 활성화
+          yaml = false,
+          markdown = true,  -- Markdown에서도 활성화
+          help = false,
+          gitcommit = true,  -- Git 커밋 메시지에서도 활성화
+          gitrebase = false,
+          ["."] = false,
+        },
+        copilot_node_command = 'node',  -- Node.js 20+ 필요
+        server_opts_overrides = {},
+      })
+    end,
+  },
   { "sindrets/diffview.nvim", dependencies = "nvim-lua/plenary.nvim" }, -- Git diff 뷰어
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     dependencies = {
-      { "github/copilot.vim" },
+      { "zbirenbaum/copilot.lua" },  -- copilot.lua와 함께 사용
       { "nvim-lua/plenary.nvim" },
     },
     build = "make tiktoken", -- MacOS/Linux에만 필요
@@ -651,6 +700,15 @@ lspconfig.jsonls.setup({
 -- nvim-cmp 설정 (자동 완성)
 local cmp = require("cmp")
 local luasnip = require("luasnip")
+
+-- Copilot과 nvim-cmp 통합을 위한 이벤트 설정
+cmp.event:on("menu_opened", function()
+  vim.b.copilot_suggestion_hidden = true
+end)
+
+cmp.event:on("menu_closed", function()
+  vim.b.copilot_suggestion_hidden = false
+end)
 
 cmp.setup({
   snippet = {
@@ -1348,14 +1406,14 @@ vim.keymap.set("v", ">", ">gv", { desc = "인덴트 늘리기 (선택 유지)" }
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "선택 블록을 아래로 이동" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "선택 블록을 위로 이동" })
 
--- GitHub Copilot 설정
-vim.g.copilot_no_tab_map = true
-vim.api.nvim_set_keymap("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
-vim.api.nvim_set_keymap("i", "<C-H>", 'copilot#Previous()', { silent = true, expr = true })
-vim.api.nvim_set_keymap("i", "<C-L>", 'copilot#Next()', { silent = true, expr = true })
-vim.g.copilot_filetypes = {
-  ["*"] = true,
-}
+-- GitHub Copilot 설정 (copilot.lua로 마이그레이션됨)
+-- 키맵은 이제 플러그인 설정에서 직접 관리됩니다.
+-- 추가 커스터마이징이 필요한 경우 아래 함수들을 사용할 수 있습니다:
+-- require("copilot.suggestion").accept()
+-- require("copilot.suggestion").next()
+-- require("copilot.suggestion").prev()
+-- require("copilot.suggestion").dismiss()
+-- require("copilot.suggestion").toggle_auto_trigger()
 
 -- GitHub Copilot Chat 설정
 local copilot_chat = require("CopilotChat")
