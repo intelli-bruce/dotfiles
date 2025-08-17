@@ -69,3 +69,146 @@ rm .env
 
 # ✅ 대신 이렇게
 mv .env .env.removed_20250527_115500
+
+
+# 🎯 Brxce CLI를 활용한 작업 관리 - 필수! ⚠️
+
+## 📋 작업 관리 원칙
+Brxce CLI를 적극 활용하여 모든 작업의 진행 상황을 체계적으로 관리합니다.
+
+### 1️⃣ 작업 시작 시
+
+#### 상위 WorkNode 찾기 (필수!)
+```bash
+# 1. 먼저 프로젝트 구조 확인
+brxce worknode tree --show-ids
+
+# 2. 관련 프로젝트/서브프로젝트 찾기
+brxce worknode list --type project,subproject
+
+# 3. 적절한 상위 노드 선택 규칙:
+# - 기능 개발 → 해당 subproject 하위
+# - 버그 수정 → 관련 subproject 또는 project 하위  
+# - 문서 작업 → 관련 project 하위
+# - 긴급 이슈 → project 직속 또는 독립 task
+
+# 4. 상위 노드 ID를 찾아서 생성
+PARENT_ID=$(brxce worknode list --type subproject | grep "CLI" | awk '{print $2}')
+brxce worknode create "[작업명]" --type task --parent $PARENT_ID --priority medium --description "[상세 설명]"
+```
+
+#### WorkNode 생성 예시
+```bash
+# CLI 관련 작업인 경우
+brxce worknode create "명령어 추가 개발" --type task --parent [CLI_subproject_ID] --priority medium
+
+# Electron 관련 작업인 경우  
+brxce worknode create "UI 컴포넌트 수정" --type task --parent [Electron_subproject_ID] --priority low
+
+# 프로젝트 전체 관련 작업
+brxce worknode create "전체 테스트 실행" --type task --parent [BRXCE_project_ID] --priority high
+
+# 복잡한 작업은 subtask로 분해
+brxce worknode create "[세부 작업]" --type subtask --parent [parent_task_ID]
+```
+
+### 2️⃣ 작업 진행 중
+```bash
+# 작업 시작 시 상태 업데이트
+brxce worknode update [ID] --status in_progress --progress 0
+
+# 진행률 업데이트 (25%, 50%, 75% 단위로)
+brxce worknode update [ID] --progress 50
+
+# 중요한 마일스톤마다 업데이트
+brxce worknode update [ID] --progress 75 --description "테스트 통과, 문서화 진행 중"
+```
+
+### 3️⃣ 작업 완료 시
+```bash
+# 작업 완료 처리
+brxce worknode update [ID] --status completed --progress 100
+
+# 전체 현황 확인
+brxce worknode tree --show-completed
+```
+
+## ⚠️ 주의사항
+- **과도한 WorkNode 생성 금지**: 실제로 추적이 필요한 의미 있는 작업만 생성
+- **적절한 계층 구조**: project > subproject > task > subtask 순서 준수
+- **진행률 정확도**: 실제 진행 상황과 일치하도록 업데이트
+- **작업 범위 준수**: 요청받은 작업 범위 내에서만 WorkNode 생성
+- **상위 노드 필수 확인**: 새 WorkNode 생성 전 반드시 적절한 부모 찾기
+
+## 🎯 상위 WorkNode 자동 선택 전략
+
+### 범용적 상위 노드 선택 규칙
+1. **현재 프로젝트 구조 파악**
+   - `brxce worknode tree --show-ids`로 전체 구조 확인
+   - 현재 활성화된 프로젝트와 서브프로젝트 목록 확인
+
+2. **작업 유형별 매칭**
+   ```bash
+   # 작업명과 설명에서 키워드 추출하여 관련 노드 찾기
+   TASK_KEYWORDS="작업명과 설명에서 추출한 키워드"
+   
+   # 1단계: 서브프로젝트에서 매칭 시도
+   PARENT=$(brxce worknode list --type subproject | grep -i "$TASK_KEYWORDS" | head -1 | awk '{print $2}')
+   
+   # 2단계: 못 찾으면 프로젝트에서 매칭
+   if [ -z "$PARENT" ]; then
+       PARENT=$(brxce worknode list --type project | grep -i "$TASK_KEYWORDS" | head -1 | awk '{print $2}')
+   fi
+   
+   # 3단계: 그래도 못 찾으면 현재 작업 중인 프로젝트 사용
+   if [ -z "$PARENT" ]; then
+       PARENT=$(brxce worknode list --type project --status in_progress | head -1 | awk '{print $2}')
+   fi
+   
+   # 4단계: 기본값 - 가장 최근 프로젝트
+   if [ -z "$PARENT" ]; then
+       PARENT=$(brxce worknode list --type project | head -1 | awk '{print $2}')
+   fi
+   ```
+
+3. **계층 구조 규칙**
+   - **긴급 버그**: 프로젝트 직속 task
+   - **기능 개발**: 관련 subproject 하위 task
+   - **세부 작업**: 부모 task 하위 subtask
+   - **문서/테스트**: 관련 프로젝트/서브프로젝트 하위
+
+## 🔄 자동화 규칙
+1. 사용자가 새로운 기능/버그 수정 요청 → 즉시 task 생성
+2. 복잡한 작업 (3단계 이상) → subtask로 분해
+3. 각 단계 완료 시 → 진행률 업데이트
+4. 최종 완료 시 → completed 상태로 변경
+5. **이슈/에러 발생 시 → 자동으로 버그 task 생성 (priority: urgent)**
+
+## 🐛 이슈/버그 자동 추적
+```bash
+# 에러나 이슈 발견 시 즉시 생성
+brxce worknode create "[이슈: 에러 내용 요약]" \
+  --type task \
+  --priority urgent \
+  --description "에러 상세: [에러 메시지 및 스택 트레이스]"
+
+# 예시: 500 에러, 빌드 실패, 테스트 실패 등
+brxce worknode create "이슈: inbox WorkNodes API 500 에러" \
+  --type task \
+  --priority urgent \
+  --description "deleted_at 필드 누락으로 인한 Prisma 쿼리 오류"
+```
+
+## 📊 상태 확인 명령어
+```bash
+# 현재 진행 중인 작업
+brxce worknode list --status in_progress
+
+# 오늘 생성된 작업
+brxce worknode list --created-after $(date +%Y-%m-%d)
+
+# 전체 프로젝트 구조
+brxce worknode tree
+```
+
+이 규칙을 따라 모든 작업을 체계적으로 관리하고 사용자에게 진행 상황을 명확하게 전달합니다

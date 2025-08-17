@@ -4,6 +4,25 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Alt/Cmd shortcuts work regardless of IME state",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "input_sources": [{ "language": "^ko$" }],
+                                        "type": "input_source_if"
+                                    }
+                                ],
+                                "from": {
+                                    "any": "key_code",
+                                    "modifiers": { "mandatory": ["option"] }
+                                },
+                                "to": [{ "select_input_source": { "language": "^en$" } }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Custom Karabiner Elements Rules",
                         "manipulators": [
                             {
@@ -11,7 +30,7 @@
                                     "key_code": "1",
                                     "modifiers": { "mandatory": ["left_command", "left_shift"] }
                                 },
-                                "to": [{ "shell_command": "open -a 'Google Chrome'" }],
+                                "to": [{ "shell_command": "open -a 'Wezterm'" }],
                                 "type": "basic"
                             },
                             {
@@ -19,7 +38,7 @@
                                     "key_code": "2",
                                     "modifiers": { "mandatory": ["left_command", "left_shift"] }
                                 },
-                                "to": [{ "shell_command": "open -a 'IntelliJ IDEA Ultimate'" }],
+                                "to": [{ "shell_command": "open -a 'Google Chrome'" }],
                                 "type": "basic"
                             },
                             {
@@ -49,7 +68,7 @@
                                         "optional": ["any"]
                                     }
                                 },
-                                "to": [{ "shell_command": "open -a 'ChatGPT'" }],
+                                "to": [{ "shell_command": "open -a 'Slack'" }],
                                 "type": "basic"
                             },
                             {
@@ -127,66 +146,6 @@
                                     }
                                 },
                                 "to": [{ "shell_command": "open -a Finder" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Capslock to ESC | Control",
-                        "manipulators": [
-                            {
-                                "description": "capslock = esc(click) | control(hold)",
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": { "optional": ["any"] }
-                                },
-                                "to": [{ "key_code": "left_control" }],
-                                "to_if_alone": [{ "key_code": "escape" }],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "escape = capslock switch",
-                                "from": {
-                                    "key_code": "escape",
-                                    "modifiers": {
-                                        "mandatory": ["left_control"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "caps_lock",
-                                        "modifiers": ["left_control"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "spacebar = language switch",
-                                "from": {
-                                    "key_code": "spacebar",
-                                    "modifiers": { "mandatory": ["left_control"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "spacebar",
-                                        "modifiers": ["left_control"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "command + spacebar = emoji",
-                                "from": {
-                                    "key_code": "spacebar",
-                                    "modifiers": { "mandatory": ["left_command", "left_control"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "spacebar",
-                                        "modifiers": ["left_control", "left_command"]
-                                    }
-                                ],
                                 "type": "basic"
                             }
                         ]

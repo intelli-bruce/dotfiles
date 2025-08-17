@@ -15,6 +15,38 @@
           }
         ]
       }
+    ],
+    "TaskComplete": [
+      {
+        "matcher": ".*complete.*|.*finish.*|.*done.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/task-complete.sh"
+          }
+        ]
+      }
+    ],
+    "ProgressUpdate": [
+      {
+        "matcher": ".*test.*pass.*|.*build.*success.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/progress-update.sh 20"
+          }
+        ]
+      }
     ]
+  },
+  "brxce": {
+    "cli_path": "brxce",
+    "auto_update": true,
+    "default_project": "BRXCE",
+    "progress_increments": {
+      "file_edit": 5,
+      "test_pass": 20,
+      "build_success": 15
+    }
   }
 }
