@@ -163,6 +163,9 @@
     "screenEdgeGapsOnMainScreenOnly" : {
       "bool" : false
     },
+    "screensOrderedByX" : {
+      "int" : 0
+    },
     "selectedCycleSizes" : {
       "int" : 0
     },
@@ -240,14 +243,6 @@
     "bottomHalf" : {
       "keyCode" : 40,
       "modifierFlags" : 1441792
-    },
-    "bottomLeft" : {
-      "keyCode" : 38,
-      "modifierFlags" : 786432
-    },
-    "bottomRight" : {
-      "keyCode" : 40,
-      "modifierFlags" : 786432
     },
     "center" : {
       "keyCode" : 8,
@@ -348,15 +343,7 @@
     "topHalf" : {
       "keyCode" : 38,
       "modifierFlags" : 1441792
-    },
-    "topLeft" : {
-      "keyCode" : 32,
-      "modifierFlags" : 786432
-    },
-    "topRight" : {
-      "keyCode" : 34,
-      "modifierFlags" : 786432
     }
   },
-  "version" : "92"
+  "version" : "95"
 }
