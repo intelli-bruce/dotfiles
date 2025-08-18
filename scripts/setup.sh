@@ -40,7 +40,8 @@ ${BOLD}${BLUE}◉ dotfiles 설정 연결을 시작합니다${RESET}
 "
 
 # 현재 디렉토리 확인
-DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOTFILES_DIR="$(dirname "$SCRIPTS_DIR")"
 echo "dotfiles 위치: $DOTFILES_DIR"
 
 # 1. WezTerm 설정
@@ -58,8 +59,19 @@ success "Neovim 설정 연결 완료"
 
 # 3. Karabiner 설정
 step "Karabiner 설정 연결 중..."
+# Karabiner가 실행 중이면 종료
+killall Karabiner-Elements 2>/dev/null || true
+killall karabiner_console_user_server 2>/dev/null || true
+sleep 1
+
 mkdir -p "$HOME/.config/karabiner"
 mkdir -p "$HOME/.config/karabiner/assets/complex_modifications"
+
+# 기존 파일이 심볼릭 링크가 아니면 삭제
+if [ -f "$HOME/.config/karabiner/karabiner.json" ] && [ ! -L "$HOME/.config/karabiner/karabiner.json" ]; then
+  rm -f "$HOME/.config/karabiner/karabiner.json"
+fi
+
 ln -sf "$DOTFILES_DIR/karabiner/karabiner.json" "$HOME/.config/karabiner/karabiner.json"
 ln -sf "$DOTFILES_DIR/karabiner/korean-ime-fix.json" "$HOME/.config/karabiner/assets/complex_modifications/korean-ime-fix.json"
 success "Karabiner 설정 연결 완료"
@@ -130,9 +142,9 @@ success "LaunchAgent 설정 완료"
 
 # 13. 스크립트 실행 권한 설정
 step "스크립트 실행 권한 설정 중..."
-find "$DOTFILES_DIR/scripts" -type f -name "*.sh" -exec chmod +x {} \;
-chmod +x "$DOTFILES_DIR/install.sh"
-chmod +x "$DOTFILES_DIR/setup.sh"
+find "$SCRIPTS_DIR" -type f -name "*.sh" -exec chmod +x {} \;
+chmod +x "$DOTFILES_DIR/install.sh" 2>/dev/null || true
+chmod +x "$DOTFILES_DIR/bootstrap.sh" 2>/dev/null || true
 success "실행 권한 설정 완료"
 
 # 완료 메시지
