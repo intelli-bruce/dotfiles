@@ -1,0 +1,20 @@
+# Ghostty Configuration - Basic Settings
+
+# Font Settings
+font-family = JetBrainsMono Nerd Font
+font-family = Pretendard
+font-family = Apple SD Gothic Neo
+font-family = Nanum Gothic
+font-size = 14
+
+# Font codepoint mapping for Korean characters
+font-codepoint-map = U+AC00-U+D7AF=Pretendard
+font-codepoint-map = U+1100-U+11FF=Pretendard
+font-codepoint-map = U+3130-U+318F=Pretendard
+
+# Window padding
+window-padding-x = 10
+window-padding-y = 10
+
+# Basic shell settings
+shell-integration = detect

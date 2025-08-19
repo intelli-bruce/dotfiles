@@ -82,39 +82,45 @@ mkdir -p "$HOME/Library/Application Support/Rectangle"
 ln -sf "$DOTFILES_DIR/rectangle/RectangleConfig.json" "$HOME/Library/Application Support/Rectangle/RectangleConfig.json"
 success "Rectangle 설정 연결 완료"
 
-# 5. tmux 설정
+# 5. Ghostty 설정
+step "Ghostty 설정 연결 중..."
+mkdir -p "$HOME/.config/ghostty"
+ln -sf "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
+success "Ghostty 설정 연결 완료"
+
+# 6. tmux 설정
 step "tmux 설정 연결 중..."
 mkdir -p "$HOME/.config/tmux"
 ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
 ln -sf "$DOTFILES_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
 success "tmux 설정 연결 완료"
 
-# 6. Yazi 설정
+# 7. Yazi 설정
 step "Yazi 설정 연결 중..."
 mkdir -p "$HOME/.config/yazi"
 ln -sf "$DOTFILES_DIR/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
 ln -sf "$DOTFILES_DIR/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
 success "Yazi 설정 연결 완료"
 
-# 7. Aerospace 설정
+# 8. Aerospace 설정
 step "Aerospace 설정 연결 중..."
 mkdir -p "$HOME/.config/aerospace"
 ln -sf "$DOTFILES_DIR/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
 success "Aerospace 설정 연결 완료"
 
-# 8. Lazygit 설정
+# 9. Lazygit 설정
 step "Lazygit 설정 연결 중..."
 mkdir -p "$HOME/Library/Application Support/lazygit"
 ln -sf "$DOTFILES_DIR/lazygit/config.yml" "$HOME/Library/Application Support/lazygit/config.yml"
 success "Lazygit 설정 연결 완료"
 
-# 9. Hammerspoon 설정
+# 10. Hammerspoon 설정
 step "Hammerspoon 설정 연결 중..."
 mkdir -p "$HOME/.hammerspoon"
 ln -sf "$DOTFILES_DIR/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
 success "Hammerspoon 설정 연결 완료"
 
-# 10. Claude 설정
+# 11. Claude 설정
 step "Claude 설정 연결 중..."
 mkdir -p "$HOME/.claude"
 ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
@@ -123,7 +129,7 @@ ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-co
 chmod +x "$DOTFILES_DIR/claude/statusline-command.sh"
 success "Claude 설정 연결 완료"
 
-# 11. Zsh 설정
+# 12. Zsh 설정
 step "Zsh 설정 연결 중..."
 ln -sf "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
 ln -sf "$DOTFILES_DIR/zsh/zprofile" "$HOME/.zprofile"
@@ -132,7 +138,7 @@ if [ -f "$DOTFILES_DIR/zsh/p10k.zsh" ]; then
 fi
 success "Zsh 설정 연결 완료"
 
-# 12. LaunchAgent 설정
+# 13. LaunchAgent 설정
 step "LaunchAgent 설정 중..."
 mkdir -p "$HOME/Library/LaunchAgents"
 ln -sf "$DOTFILES_DIR/launchd/com.tmux.start.plist" "$HOME/Library/LaunchAgents/com.tmux.start.plist"
@@ -140,7 +146,7 @@ launchctl unload "$HOME/Library/LaunchAgents/com.tmux.start.plist" 2>/dev/null |
 launchctl load "$HOME/Library/LaunchAgents/com.tmux.start.plist"
 success "LaunchAgent 설정 완료"
 
-# 13. 스크립트 실행 권한 설정
+# 14. 스크립트 실행 권한 설정
 step "스크립트 실행 권한 설정 중..."
 find "$SCRIPTS_DIR" -type f -name "*.sh" -exec chmod +x {} \;
 chmod +x "$DOTFILES_DIR/install.sh" 2>/dev/null || true
