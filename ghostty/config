@@ -47,7 +47,7 @@ keybind = alt+n=previous_tab
 keybind = alt+p=next_tab
 
 # New tab with Alt+c (tmux: Alt+c for new window)
-keybind = alt+c=new_tab
+# keybind = alt+c=new_tab  # Removed - using Cmd+T instead
 
 # Switch to tab by number with Alt+1-5 (tmux: Alt+1-5)
 keybind = alt+one=goto_tab:1
