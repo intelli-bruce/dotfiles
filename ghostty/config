@@ -19,6 +19,11 @@ window-padding-y = 10
 # Basic shell settings
 shell-integration = detect
 
+# Session restoration (macOS only)
+# Saves window state (position, size, tabs, splits) on exit
+# Note: Does not save running processes or shell output
+window-save-state = always
+
 # ===== Keybindings (tmux-style) =====
 
 # Pane navigation with Alt+h/j/k/l (tmux: Alt+h/j/k/l)
