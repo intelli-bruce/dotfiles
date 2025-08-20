@@ -10,7 +10,7 @@ theme = Dracula
 font-family = JetBrainsMono Nerd Font
 font-family = Pretendard
 font-family = Apple SD Gothic Neo
-font-size = 16
+font-size = 16.5
 
 # Window padding
 window-padding-x = 10
