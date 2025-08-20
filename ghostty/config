@@ -68,8 +68,8 @@ keybind = alt+ctrl+j=resize_split:down,10
 keybind = alt+ctrl+k=resize_split:up,10
 keybind = alt+ctrl+l=resize_split:right,10
 
-# Copy mode with Alt+a (tmux: Alt+a)
-keybind = alt+a=copy_to_clipboard
+# Write scrollback to file with Alt+a
+keybind = alt+a=write_scrollback_file:open
 
 # Scrolling with Alt+u/d (tmux: Alt+u/d for half page scroll)
 keybind = alt+u=scroll_page_up
@@ -77,7 +77,7 @@ keybind = alt+d=scroll_page_down
 
 # Quick actions
 # keybind = alt+q=show_split_debugger  # Not available in Ghostty
-keybind = alt+space=equalize_splits
+keybind = ctrl+space=equalize_splits
 keybind = alt+equal=equalize_splits
 
 # Reload config with Cmd+Shift+R (macOS style)

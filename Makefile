@@ -83,6 +83,12 @@ tmux-plugins: ## tmux 플러그인만 설치
 		git clone https://github.com/tmux-plugins/tpm $$HOME/.tmux/plugins/tpm; \
 	fi
 
+ghostty: ## Ghostty 설정만 연결
+	@echo "$(BLUE)▶ Ghostty 설정 연결 중...$(RESET)"
+	@mkdir -p $$HOME/.config/ghostty
+	@ln -sf $(DOTFILES_DIR)/ghostty/config $$HOME/.config/ghostty/config
+	@echo "$(GREEN)✓ Ghostty 설정 완료$(RESET)"
+
 ## 유틸리티
 backup: ## 현재 설정 백업
 	@echo "$(BLUE)▶ 설정 백업 중...$(RESET)"
