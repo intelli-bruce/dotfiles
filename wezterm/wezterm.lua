@@ -51,6 +51,12 @@ return {
     freetype_render_target = 'Normal',  -- HorizontalLcd에서 Normal로 변경
     
     color_scheme = "Dracula",
+    
+    -- 패널 구분을 위한 설정
+    inactive_pane_hsb = {
+        saturation = 0.6,  -- 비활성 패널 더 흐리게
+        brightness = 0.5,  -- 비활성 패널 더 어둡게
+    },
     initial_rows = 30,
     initial_cols = 100,
     enable_tab_bar = true,  -- 탭바 활성화 (Alt+c, Alt+1~5 등 탭 기능 사용을 위해)
@@ -152,11 +158,6 @@ return {
         },
         
         -- Workspace 관리 단축키
-        {
-            key = 'w',
-            mods = 'CMD',
-            action = act.ShowLauncherArgs { flags = 'FUZZY|WORKSPACES' },  -- Workspace 선택기
-        },
         {
             key = 'W',
             mods = 'CMD|SHIFT',
