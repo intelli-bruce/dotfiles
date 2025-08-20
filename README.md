@@ -47,7 +47,7 @@ make check             # 링크 상태 확인
 ## 📦 포함된 도구
 
 **Shell**: Zsh, Oh My Zsh, Powerlevel10k  
-**터미널**: WezTerm, tmux, Neovim  
+**터미널**: Ghostty, Neovim  
 **유틸리티**: Yazi, LazyGit, Claude Code  
 **macOS**: Karabiner, Rectangle, AeroSpace, Hammerspoon
 
@@ -55,16 +55,15 @@ make check             # 링크 상태 확인
 
 | 앱 | 시스템 위치 | dotfiles 위치 |
 |---|---|---|
-| WezTerm | `~/.wezterm.lua` | `wezterm/` |
+| Ghostty | `~/.config/ghostty/` | `ghostty/` |
 | Neovim | `~/.config/nvim/` | `nvim/` |
-| tmux | `~/.tmux.conf` | `tmux/` |
 | Karabiner | `~/.config/karabiner/` | `karabiner/` |
 | Zsh | `~/.zshrc` | `zsh/` |
 
 ## 💡 팁
 
 **폰트 설치**: `brew install --cask font-meslo-lg-nerd-font`  
-**tmux 플러그인**: tmux 내에서 `Ctrl+e I`  
+**Ghostty 설정 리로드**: `Cmd+Shift+R`  
 **P10k 설정**: `p10k configure`
 
 ## 📝 라이센스

@@ -10,7 +10,6 @@ tap "d12frosted/emacs"
 brew "git"       # 버전 관리 시스템
 brew "curl"      # URL 다운로드 도구
 brew "wget"      # 또 다른 다운로드 도구
-brew "tmux"      # 터미널 멀티플렉서
 brew "neovim"    # 향상된 Vim 편집기
 brew "ripgrep"   # 빠른 검색 도구
 brew "fzf"       # 퍼지 파인더
@@ -30,7 +29,6 @@ brew "python@3.13" # Python 3.13
 brew "uv"          # Python 패키지 관리자
 
 # 개발 툴
-cask "wezterm"              # 터미널 에뮬레이터
 cask "karabiner-elements"   # 키보드 커스터마이저
 cask "rectangle"            # 창 관리 도구
 cask "docker"               # 컨테이너 플랫폼

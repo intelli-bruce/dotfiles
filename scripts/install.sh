@@ -107,37 +107,7 @@ else
   success "zsh-syntax-highlighting이 이미 설치되어 있습니다"
 fi
 
-# 6. tmux 플러그인 매니저 설치
-step "tmux 플러그인 설치 중..."
-
-# TPM (Tmux Plugin Manager)
-TMUX_TPM_DIR="$HOME/.tmux/plugins/tpm"
-if [ ! -d "$TMUX_TPM_DIR" ]; then
-  git clone https://github.com/tmux-plugins/tpm "$TMUX_TPM_DIR"
-  success "TPM 설치 완료"
-else
-  success "TPM이 이미 설치되어 있습니다"
-fi
-
-# tmux-resurrect
-TMUX_RESURRECT_DIR="$HOME/.tmux/plugins/tmux-resurrect"
-if [ ! -d "$TMUX_RESURRECT_DIR" ]; then
-  git clone https://github.com/tmux-plugins/tmux-resurrect "$TMUX_RESURRECT_DIR"
-  success "tmux-resurrect 설치 완료"
-else
-  success "tmux-resurrect가 이미 설치되어 있습니다"
-fi
-
-# tmux-continuum
-TMUX_CONTINUUM_DIR="$HOME/.tmux/plugins/tmux-continuum"
-if [ ! -d "$TMUX_CONTINUUM_DIR" ]; then
-  git clone https://github.com/tmux-plugins/tmux-continuum "$TMUX_CONTINUUM_DIR"
-  success "tmux-continuum 설치 완료"
-else
-  success "tmux-continuum이 이미 설치되어 있습니다"
-fi
-
-# 7. Yazi 플러그인 설치
+# 6. Yazi 플러그인 설치
 step "Yazi 플러그인 설치 중..."
 mkdir -p "$HOME/.config/yazi/plugins"
 

@@ -7,8 +7,5 @@ alias lg='lazygit'
 # yazi file manager
 alias yz='yazi'
 
-# tmux
-alias tm='tmux'
-
 # bx-cli development
 alias bxdev='cd ~/Projects/bx/bx-cli'
