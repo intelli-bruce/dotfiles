@@ -243,7 +243,7 @@ return {
         
         -- 패널 관리
         { key = 'w', mods = 'ALT', action = act.CloseCurrentPane { confirm = true } }, -- Alt+w 패널 닫기
-        { key = 'f', mods = 'ALT', action = act.TogglePaneZoomState }, -- Alt+f 패널 확대/축소
+        { key = 'Enter', mods = 'ALT|SHIFT', action = act.TogglePaneZoomState }, -- Alt+Shift+Enter 패널 확대/축소
         { key = '!', mods = 'ALT|SHIFT', action = act.PaneSelect { mode = 'MoveToNewTab' } }, -- Alt+! 패널을 새 탭으로
         { key = 'o', mods = 'ALT', action = act.ActivatePaneDirection 'Next' }, -- Alt+o 다음 패널
         { key = 'O', mods = 'ALT|SHIFT', action = act.ActivatePaneDirection 'Prev' }, -- Alt+Shift+o 이전 패널
