@@ -14,6 +14,27 @@ wezterm.on('balance-panes', function(window, pane)
     window:perform_action(act.PaneSelect { mode = 'SwapWithActive' }, pane)
 end)
 
+-- 상태바에 현재 Workspace 표시
+wezterm.on('update-right-status', function(window, pane)
+    local workspace = window:active_workspace()
+    local time = wezterm.strftime '%H:%M'
+    
+    -- PowerLine 스타일
+    local SOLID_LEFT_ARROW = utf8.char(0xe0b2)
+    
+    window:set_right_status(wezterm.format {
+        { Background = { Color = '#3c1361' } },
+        { Foreground = { Color = '#c0c0c0' } },
+        { Text = ' 🗂 ' .. workspace .. ' ' },
+        { Background = { Color = '#52307c' } },
+        { Foreground = { Color = '#3c1361' } },
+        { Text = SOLID_LEFT_ARROW },
+        { Background = { Color = '#52307c' } },
+        { Foreground = { Color = '#c0c0c0' } },
+        { Text = ' ' .. time .. ' ' },
+    })
+end)
+
 return {
     -- 폰트 설정을 단순화하고 JetBrainsMono를 메인으로 사용
     font = wezterm.font_with_fallback {
@@ -128,6 +149,65 @@ return {
             key = 'k',
             mods = 'CMD',
             action = act.ClearScrollback 'ScrollbackAndViewport',  -- 화면 완전 클리어
+        },
+        
+        -- Workspace 관리 단축키
+        {
+            key = 'w',
+            mods = 'CMD',
+            action = act.ShowLauncherArgs { flags = 'FUZZY|WORKSPACES' },  -- Workspace 선택기
+        },
+        {
+            key = 'W',
+            mods = 'CMD|SHIFT',
+            action = act.PromptInputLine {
+                description = wezterm.format {
+                    { Attribute = { Intensity = 'Bold' } },
+                    { Foreground = { AnsiColor = 'Fuchsia' } },
+                    { Text = 'Enter name for new workspace' },
+                },
+                action = wezterm.action_callback(function(window, pane, line)
+                    if line and line ~= '' then
+                        window:perform_action(
+                            act.SwitchToWorkspace { name = line },
+                            pane
+                        )
+                    end
+                end),
+            },  -- 새 Workspace 생성
+        },
+        {
+            key = 'S',
+            mods = 'CMD|SHIFT',
+            action = wezterm.action_callback(function(window, pane)
+                local current = window:active_workspace()
+                window:perform_action(
+                    act.PromptInputLine {
+                        description = wezterm.format {
+                            { Attribute = { Intensity = 'Bold' } },
+                            { Foreground = { AnsiColor = 'Yellow' } },
+                            { Text = 'Rename workspace from "' .. current .. '" to:' },
+                        },
+                        action = wezterm.action_callback(function(inner_window, inner_pane, new_name)
+                            if new_name and new_name ~= '' then
+                                -- workspace 이름 변경 (실제로는 새 workspace로 이동)
+                                wezterm.mux.rename_workspace(current, new_name)
+                            end
+                        end),
+                    },
+                    pane
+                )
+            end),  -- Workspace 이름 변경
+        },
+        {
+            key = '[',
+            mods = 'CMD',
+            action = act.SwitchWorkspaceRelative(-1),  -- 이전 Workspace
+        },
+        {
+            key = ']',
+            mods = 'CMD',
+            action = act.SwitchWorkspaceRelative(1),  -- 다음 Workspace
         },
 
         -- === tmux Alt 키 기능 이식 ===
