@@ -17,7 +17,7 @@ window-padding-x = 10
 window-padding-y = 10
 
 # Window transparency and blur
-background-opacity = 0.85
+background-opacity = 0.95
 background-blur = 20
 
 # Focus/unfocus panel brightness
