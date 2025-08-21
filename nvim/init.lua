@@ -298,9 +298,10 @@ require("dracula-colorful").setup()
 
 -- Dracula Colorful 스타일을 위한 추가 하이라이팅 설정
 -- 기본 텍스트 색상을 약간 더 어둡게 변경 (#F8F8F2 -> #E6E6E6)
-vim.api.nvim_command("highlight Normal guifg=#E6E6E6 guibg=#282A36")
-vim.api.nvim_command("highlight NormalFloat guifg=#E6E6E6 guibg=#282A36")
-vim.api.nvim_command("highlight NormalNC guifg=#CCCCCC guibg=#282A36")
+-- 배경을 투명하게 설정 (guibg=NONE)
+vim.api.nvim_command("highlight Normal guifg=#E6E6E6 guibg=NONE ctermbg=NONE")
+vim.api.nvim_command("highlight NormalFloat guifg=#E6E6E6 guibg=NONE ctermbg=NONE")
+vim.api.nvim_command("highlight NormalNC guifg=#CCCCCC guibg=NONE ctermbg=NONE")
 
 vim.api.nvim_command("highlight Comment ctermfg=61 guifg=#6272A4")
 vim.api.nvim_command("highlight CursorLine ctermbg=234 guibg=#44475A")
@@ -425,18 +426,18 @@ require("nvim-tree").setup({
   },
 })
 
--- nvim 시작 시 자동으로 nvim-tree 열기
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function(data)
-    -- 디렉토리가 아니거나 파일이 열린 경우에만 nvim-tree 열기
-    local directory = vim.fn.isdirectory(data.file) == 1
-    
-    if not directory then
-      require("nvim-tree.api").tree.open()
-    end
-  end,
-  once = true,
-})
+-- nvim 시작 시 자동으로 nvim-tree 열기 (비활성화)
+-- vim.api.nvim_create_autocmd("VimEnter", {
+--   callback = function(data)
+--     -- 디렉토리가 아니거나 파일이 열린 경우에만 nvim-tree 열기
+--     local directory = vim.fn.isdirectory(data.file) == 1
+--     
+--     if not directory then
+--       require("nvim-tree.api").tree.open()
+--     end
+--   end,
+--   once = true,
+-- })
 
 -- 상태바 초기화 (Dracula Colorful 스타일)
 require("lualine").setup({
@@ -570,7 +571,7 @@ require("telescope").setup({
     TelescopeSelection = { bg = "#44475A", fg = "#E6E6E6" },
     TelescopeSelectionCaret = { fg = "#FF79C6" },
     TelescopeMultiSelection = { fg = "#50FA7B" },
-    TelescopeNormal = { bg = "#282A36" },
+    TelescopeNormal = { bg = "NONE" },
     TelescopeMatching = { fg = "#FFB86C" },
   },
 })
@@ -579,6 +580,36 @@ require("telescope").load_extension("file_browser")
 -- Telescope file browser 단축키 설정
 vim.keymap.set("n", "<leader>fb", ":Telescope file_browser<CR>", { desc = "파일 브라우저 열기", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>fp", ":Telescope file_browser path=%:p:h<CR>", { desc = "현재 파일 위치에서 브라우저 열기", noremap = true, silent = true })
+
+-- 추가 투명 배경 설정 (더 많은 요소들에 적용)
+vim.api.nvim_create_autocmd("ColorScheme", {
+  pattern = "*",
+  callback = function()
+    -- 메인 배경 투명화
+    vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE", ctermbg = "NONE" })
+    
+    -- 사이드바 및 기타 UI 요소 투명화
+    vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "LineNr", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "Folded", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "VertSplit", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE", ctermbg = "NONE" })
+    
+    -- NvimTree 투명화
+    vim.api.nvim_set_hl(0, "NvimTreeNormal", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "NvimTreeEndOfBuffer", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "NvimTreeVertSplit", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "NvimTreeWinSeparator", { bg = "NONE", ctermbg = "NONE" })
+    
+    -- Telescope 투명화
+    vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "TelescopeBorder", { bg = "NONE", ctermbg = "NONE" })
+  end
+})
 
 -- Mason 설정 (LSP, linter, formatter 설치 관리자)
 require("mason").setup({
@@ -1551,3 +1582,23 @@ require("which-key").setup({
     v = { "j", "k" },
   },
 })
+
+-- 테마 로드 후 즉시 투명 배경 적용
+vim.cmd([[
+  hi Normal guibg=NONE ctermbg=NONE
+  hi NormalFloat guibg=NONE ctermbg=NONE
+  hi NormalNC guibg=NONE ctermbg=NONE
+  hi SignColumn guibg=NONE ctermbg=NONE
+  hi EndOfBuffer guibg=NONE ctermbg=NONE
+  hi LineNr guibg=NONE ctermbg=NONE
+  hi Folded guibg=NONE ctermbg=NONE
+  hi VertSplit guibg=NONE ctermbg=NONE
+  hi StatusLine guibg=NONE ctermbg=NONE
+  hi StatusLineNC guibg=NONE ctermbg=NONE
+  hi NvimTreeNormal guibg=NONE ctermbg=NONE
+  hi NvimTreeEndOfBuffer guibg=NONE ctermbg=NONE
+  hi NvimTreeVertSplit guibg=NONE ctermbg=NONE
+  hi NvimTreeWinSeparator guibg=NONE ctermbg=NONE
+  hi TelescopeNormal guibg=NONE ctermbg=NONE
+  hi TelescopeBorder guibg=NONE ctermbg=NONE
+]])
