@@ -27,24 +27,24 @@ vim.opt.autoread = true -- 외부에서 파일이 변경되면 자동으로 다�
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- 한글 입력 자동 전환 설정 (macOS)
-if vim.fn.has('mac') == 1 then
-  -- Insert mode 진입 시 이전 입력 소스 저장
-  vim.api.nvim_create_autocmd({"InsertEnter"}, {
-    pattern = "*",
-    callback = function()
-      vim.b.ime_status = vim.fn.system("osascript -e 'tell application \"System Events\" to get the name of the current input source'")
-    end
-  })
-  
-  -- Insert mode 벗어날 때 영문으로 전환
-  vim.api.nvim_create_autocmd({"InsertLeave"}, {
-    pattern = "*",
-    callback = function()
-      os.execute("osascript -e 'tell application \"System Events\" to select input source \"ABC\"' &")
-    end
-  })
-end
+-- 한글 입력 자동 전환 설정 (macOS) - 임시 비활성화 (에러 디버깅)
+-- if vim.fn.has('mac') == 1 then
+--   -- Insert mode 진입 시 이전 입력 소스 저장
+--   vim.api.nvim_create_autocmd({"InsertEnter"}, {
+--     pattern = "*",
+--     callback = function()
+--       vim.b.ime_status = vim.fn.system([[osascript -e 'tell application "System Events" to get the name of the current input source']])
+--     end
+--   })
+--   
+--   -- Insert mode 벗어날 때 영문으로 전환
+--   vim.api.nvim_create_autocmd({"InsertLeave"}, {
+--     pattern = "*",
+--     callback = function()
+--       os.execute([[osascript -e 'tell application "System Events" to select input source "ABC"' &]])
+--     end
+--   })
+-- end
 
 -- lazy.nvim 플러그인 매니저 설정
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -1128,9 +1128,11 @@ vim.keymap.set("n", "<leader>Q", ":q!<CR>", { desc = "강제 종료", noremap = 
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "버퍼 닫기", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>bD", ":bd!<CR>", { desc = "버퍼 강제 닫기", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", { desc = "검색 강조 제거", noremap = true, silent = true })
+-- 검색 후 ESC ESC로 하이라이팅 제거 (두 번 눌러야 함으로 안전)
+vim.keymap.set("n", "<Esc><Esc>", ":nohlsearch<CR>", { desc = "검색 하이라이팅 제거", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>r", ":checktime<CR>", { desc = "외부 변경 사항 확인", noremap = true, silent = true })
--- ESC 키로 검색 하이라이팅 제거
-vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "검색 하이라이팅 제거", noremap = true, silent = true })
+-- ESC 키 매핑 제거 (기본 동작 유지)
+-- vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "검색 하이라이팅 제거", noremap = true, silent = true })
 
 -- 더 안정적인 방법: 자동 명령어로 ESC 키 누를 때 자동으로 하이라이팅 제거
 vim.cmd([[
