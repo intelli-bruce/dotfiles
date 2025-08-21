@@ -253,6 +253,46 @@ require("nvim-tree").setup({
       return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
     end
     
+    -- h/l 키로 폴더 접기/펼치기
+    vim.keymap.set('n', 'l', function()
+      local node = api.tree.get_node_under_cursor()
+      if node then
+        if node.type == "directory" then
+          api.node.open.edit()
+        else
+          api.node.open.edit()
+        end
+      end
+    end, opts('Open'))
+    
+    vim.keymap.set('n', 'h', function()
+      local node = api.tree.get_node_under_cursor()
+      if node then
+        if node.type == "directory" and node.open then
+          api.node.open.edit()
+        else
+          api.node.navigate.parent_close()
+        end
+      end
+    end, opts('Close'))
+    
+    -- 프로젝트 루트로 돌아가기
+    vim.keymap.set('n', 'H', api.tree.change_root_to_parent, opts('Up to parent directory'))
+    vim.keymap.set('n', '.', api.tree.change_root_to_node, opts('Change root to current node'))
+    vim.keymap.set('n', '~', function()
+      -- 현재 작업 디렉터리로 변경하고 트리 새로고침
+      local cwd = vim.fn.getcwd()
+      api.tree.change_root(cwd)
+      api.tree.reload()
+    end, opts('Change to current working directory'))
+    
+    -- 추가: 프로젝트 루트로 포커스 이동 (루트 변경 없이)
+    vim.keymap.set('n', 'P', function()
+      -- 트리의 최상위로 이동
+      api.tree.focus()
+      vim.cmd('normal! gg')
+    end, opts('Go to tree root'))
+    
     -- Git diff 보기 (수직 분할)
     vim.keymap.set('n', 'gd', function()
       local node = api.tree.get_node_under_cursor()
