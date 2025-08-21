@@ -50,8 +50,6 @@ sync: ## 시스템 설정을 dotfiles로 동기화 (기본: 전체)
 sync-karabiner: ## Karabiner 설정만 동기화
 	@bash $(SCRIPTS_DIR)/sync.sh karabiner
 
-sync-tmux: ## tmux 설정만 동기화
-	@bash $(SCRIPTS_DIR)/sync.sh tmux
 
 sync-neovim: ## Neovim 설정만 동기화
 	@bash $(SCRIPTS_DIR)/sync.sh neovim
@@ -77,11 +75,6 @@ zsh-plugins: ## Zsh 플러그인만 설치
 		git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting; \
 	fi
 
-tmux-plugins: ## tmux 플러그인만 설치
-	@echo "$(BLUE)▶ tmux 플러그인 설치 중...$(RESET)"
-	@if [ ! -d "$$HOME/.tmux/plugins/tpm" ]; then \
-		git clone https://github.com/tmux-plugins/tpm $$HOME/.tmux/plugins/tpm; \
-	fi
 
 ghostty: ## Ghostty 설정만 연결
 	@echo "$(BLUE)▶ Ghostty 설정 연결 중...$(RESET)"
@@ -101,12 +94,10 @@ backup: ## 현재 설정 백업
 
 check: ## 설정 파일 링크 상태 확인
 	@echo "$(BLUE)▶ 설정 파일 상태 확인$(RESET)"
-	@echo "\nWezTerm:"
-	@ls -la ~/.wezterm.lua 2>/dev/null || echo "  Not linked"
+	@echo "\nGhostty:"
+	@ls -la ~/.config/ghostty/config 2>/dev/null || echo "  Not linked"
 	@echo "\nNeovim:"
 	@ls -la ~/.config/nvim/init.lua 2>/dev/null || echo "  Not linked"
-	@echo "\ntmux:"
-	@ls -la ~/.tmux.conf 2>/dev/null || echo "  Not linked"
 	@echo "\nKarabiner:"
 	@ls -la ~/.config/karabiner/karabiner.json 2>/dev/null || echo "  Not linked"
 
@@ -115,9 +106,8 @@ clean: ## 모든 심볼릭 링크 제거 (주의!)
 	@read -p "계속하시겠습니까? (y/n) " -n 1 -r; \
 	echo; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		rm -f ~/.wezterm.lua; \
+		rm -f ~/.config/ghostty/config; \
 		rm -f ~/.config/nvim/init.lua; \
-		rm -f ~/.tmux.conf; \
 		rm -f ~/.config/karabiner/karabiner.json; \
 		rm -f ~/.zshrc; \
 		echo "$(GREEN)✓ 링크 제거 완료$(RESET)"; \

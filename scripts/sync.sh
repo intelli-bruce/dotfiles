@@ -81,12 +81,6 @@ sync_rectangle() {
             "Rectangle 설정"
 }
 
-sync_wezterm() {
-  step "WezTerm 설정 동기화 중..."
-  sync_file "$HOME/.wezterm.lua" \
-            "$DOTFILES_DIR/wezterm/wezterm.lua" \
-            "WezTerm 설정"
-}
 
 sync_neovim() {
   step "Neovim 설정 동기화 중..."
@@ -101,12 +95,6 @@ sync_neovim() {
   fi
 }
 
-sync_tmux() {
-  step "tmux 설정 동기화 중..."
-  sync_file "$HOME/.tmux.conf" \
-            "$DOTFILES_DIR/tmux/tmux.conf" \
-            "tmux 설정"
-}
 
 sync_yazi() {
   step "Yazi 설정 동기화 중..."
@@ -175,9 +163,7 @@ sync_zsh() {
 sync_all() {
   sync_karabiner
   sync_rectangle
-  sync_wezterm
   sync_neovim
-  sync_tmux
   sync_yazi
   sync_aerospace
   sync_lazygit
@@ -216,9 +202,7 @@ ${BOLD}옵션:${RESET}
   ${GREEN}all${RESET}           모든 설정 동기화 (기본값)
   ${GREEN}karabiner${RESET}     Karabiner 설정만 동기화
   ${GREEN}rectangle${RESET}     Rectangle 설정만 동기화
-  ${GREEN}wezterm${RESET}       WezTerm 설정만 동기화
   ${GREEN}neovim${RESET}        Neovim 설정만 동기화
-  ${GREEN}tmux${RESET}          tmux 설정만 동기화
   ${GREEN}yazi${RESET}          Yazi 설정만 동기화
   ${GREEN}aerospace${RESET}     Aerospace 설정만 동기화
   ${GREEN}lazygit${RESET}       Lazygit 설정만 동기화
@@ -230,7 +214,7 @@ ${BOLD}옵션:${RESET}
 ${BOLD}예시:${RESET}
   ./sync.sh                 # 모든 설정 동기화
   ./sync.sh karabiner       # Karabiner만 동기화
-  ./sync.sh karabiner tmux  # 여러 개 동기화
+  ./sync.sh karabiner yazi  # 여러 개 동기화
 
 ${BOLD}${YELLOW}주의사항:${RESET}
 - 이 스크립트는 시스템 → dotfiles 방향으로만 동기화합니다
@@ -266,14 +250,8 @@ ${BOLD}${BLUE}◉ dotfiles 선택적 동기화를 시작합니다${RESET}
       rectangle)
         sync_rectangle
         ;;
-      wezterm)
-        sync_wezterm
-        ;;
       neovim|nvim|vim)
         sync_neovim
-        ;;
-      tmux)
-        sync_tmux
         ;;
       yazi)
         sync_yazi
