@@ -54,3 +54,19 @@ keybind = super+ctrl+equal=equalize_splits
 # Scrolling keybindings
 keybind = super+shift+u=scroll_page_up
 keybind = super+shift+d=scroll_page_down
+
+# Quick Terminal settings
+quick-terminal-position = center
+quick-terminal-screen = main
+quick-terminal-animation-duration = 0.2
+quick-terminal-autohide = false
+quick-terminal-space-behavior = move
+
+# Fullscreen support for Quick Terminal
+macos-non-native-fullscreen = true
+
+# Quick Terminal keybinding (Cmd+Shift+O)
+keybind = cmd+shift+o=toggle_quick_terminal
+
+# Quick Terminal fullscreen toggle (Cmd+Shift+Enter)
+keybind = cmd+shift+enter=toggle_fullscreen
