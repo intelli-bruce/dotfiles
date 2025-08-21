@@ -536,16 +536,10 @@ require("telescope").setup({
   },
   pickers = {
     find_files = {
-      layout_strategy = "horizontal",
-      layout_config = {
-        preview_width = 0.6, -- 파일 검색 시 미리보기 창을 더 넓게
-      },
+      previewer = false, -- 파일 검색 시 미리보기 비활성화
     },
     live_grep = {
-      layout_strategy = "horizontal",
-      layout_config = {
-        preview_width = 0.6, -- 텍스트 검색 시 미리보기 창을 더 넓게
-      },
+      previewer = false, -- 텍스트 검색 시 미리보기 비활성화
     },
     buffers = {
       layout_strategy = "horizontal",
@@ -1362,7 +1356,9 @@ vim.cmd [[
 
 -- 기타 유용한 단축키
 vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "저장", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>s", ":w<CR>", { desc = "저장 (단축)", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>Q", ":q!<CR>", { desc = "강제 종료", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>", { desc = "검색 강조 제거", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>r", ":checktime<CR>", { desc = "외부 변경 사항 확인", noremap = true, silent = true })
 -- ESC 키로 검색 하이라이팅 제거
