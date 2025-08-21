@@ -39,17 +39,17 @@ keybind = super+shift+k=goto_split:up
 keybind = super+shift+l=goto_split:right
 
 # Panel resize keybindings
-keybind = super+ctrl+h=resize_split:left,10
-keybind = super+ctrl+j=resize_split:down,10
-keybind = super+ctrl+k=resize_split:up,10
-keybind = super+ctrl+l=resize_split:right,10
+keybind = super+alt+h=resize_split:left,10
+keybind = super+alt+j=resize_split:down,10
+keybind = super+alt+k=resize_split:up,10
+keybind = super+alt+l=resize_split:right,10
 
 # Panel split keybindings
 keybind = super+shift+backslash=new_split:right
 keybind = super+shift+minus=new_split:down
 
 # Equalize all panels
-keybind = super+ctrl+equal=equalize_splits
+keybind = super+alt+equal=equalize_splits
 
 # Toggle split zoom (maximize current panel)
 keybind = super+shift+enter=toggle_split_zoom
