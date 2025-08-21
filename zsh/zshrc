@@ -124,3 +124,5 @@ export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"
 export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
 
 export PATH="$PATH:/Users/brucechoe/Library/Android/sdk/platform-tools"
+
+export PATH="$HOME/.claude/local:$PATH"
