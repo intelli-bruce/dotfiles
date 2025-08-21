@@ -107,7 +107,16 @@ else
   success "zsh-syntax-highlighting이 이미 설치되어 있습니다"
 fi
 
-# 6. Yazi 플러그인 설치
+# 6. Zoxide 설치
+step "Zoxide 설치 중..."
+if ! command -v zoxide &> /dev/null; then
+  brew install zoxide
+  success "Zoxide 설치 완료"
+else
+  success "Zoxide가 이미 설치되어 있습니다"
+fi
+
+# 7. Yazi 플러그인 설치
 step "Yazi 플러그인 설치 중..."
 mkdir -p "$HOME/.config/yazi/plugins"
 
