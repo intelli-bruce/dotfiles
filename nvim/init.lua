@@ -161,6 +161,26 @@ require("lazy").setup({
   { "folke/which-key.nvim", opts = {} },
   { "b0o/schemastore.nvim" }, -- JSON 스키마 저장소
   { "HiPhish/rainbow-delimiters.nvim" }, -- 괄호 색상 표시
+  
+  -- 한/영 자동 전환 플러그인 (im-select 사용)
+  {
+    "keaising/im-select.nvim",
+    config = function()
+      require('im_select').setup({
+        -- 기본 입력기 (영어)
+        default_im_select = "com.apple.keylayout.ABC",
+        
+        -- macOS의 im-select 명령어 사용
+        default_command = "im-select",
+        
+        -- Normal 모드로 전환 시 영어로 변경
+        set_default_events = { "VimEnter", "InsertLeave", "CmdlineLeave" },
+        
+        -- Insert 모드 진입 시 이전 입력기로 복원
+        set_previous_events = { "InsertEnter" },
+      })
+    end,
+  },
   -- minimap.vim 제거 (code-minimap 바이너리 필요)
   -- { 
   --   "wfxr/minimap.vim", 
@@ -175,6 +195,161 @@ require("lazy").setup({
   -- },
 
   { "rafamadriz/friendly-snippets" }, -- 추가 스니펫 컬렉션
+  
+  -- 미니맵 플러그인 옵션 1: Satellite (스크롤바 스타일)
+  {
+    "lewis6991/satellite.nvim",
+    enabled = true,  -- false로 변경하면 mini.map 사용
+    config = function()
+      require('satellite').setup({
+        current_only = false,  -- 모든 창에 미니맵 표시
+        winblend = 50,  -- 투명도 (0-100, 낮을수록 불투명)
+        zindex = 40,
+        excluded_filetypes = { "NvimTree", "prompt", "TelescopePrompt", "DashboardHeader", "alpha" },
+        width = 2,  -- 미니맵 너비
+        handlers = {
+          cursor = {
+            enable = true,
+            overlap = true,
+            -- 커서 위치 표시
+            symbols = { '⎺', '⎻', '⎼', '⎽' }
+          },
+          search = {
+            enable = true,
+            overlap = true,
+            -- 검색 결과 표시
+            symbols = { '◉', '◎' }
+          },
+          diagnostic = {
+            enable = true,
+            signs = {'-', '=', '≡'},
+            min_severity = vim.diagnostic.severity.HINT,
+          },
+          gitsigns = {
+            enable = true,
+            signs = {
+              add = "│",
+              change = "│",
+              delete = "-",
+            },
+          },
+          marks = {
+            enable = true,
+            show_builtins = false,
+          },
+        },
+      })
+    end
+  },
+  
+  -- 미니맵 플러그인 옵션 2: mini.map (코드 미니맵)
+  {
+    'echasnovski/mini.map',
+    enabled = false,  -- true로 변경하면 이것을 사용
+    version = false,
+    config = function()
+      local map = require('mini.map')
+      map.setup({
+        integrations = {
+          map.gen_integration.builtin_search(),
+          map.gen_integration.diagnostic({
+            error = 'DiagnosticFloatingError',
+            warn  = 'DiagnosticFloatingWarn',
+            info  = 'DiagnosticFloatingInfo',
+            hint  = 'DiagnosticFloatingHint',
+          }),
+          map.gen_integration.gitsigns(),
+        },
+        symbols = {
+          encode = map.gen_encode_symbols.dot('4x2'),
+          scroll_line = '█',
+          scroll_view = '┃',
+        },
+        window = {
+          side = 'right',
+          width = 15, -- 미니맵 너비
+          winblend = 15, -- 투명도
+          show_integration_count = false,
+        },
+      })
+      
+      -- 자동으로 미니맵 열기
+      vim.keymap.set('n', '<Leader>mm', map.toggle, { desc = "미니맵 토글" })
+      vim.keymap.set('n', '<Leader>mr', map.refresh, { desc = "미니맵 새로고침" })
+      
+      -- 파일 열 때 자동으로 미니맵 표시
+      vim.api.nvim_create_autocmd("BufEnter", {
+        callback = function()
+          local ft = vim.bo.filetype
+          local excluded = { "NvimTree", "TelescopePrompt", "alpha", "dashboard" }
+          if not vim.tbl_contains(excluded, ft) and vim.fn.line('$') > 50 then
+            map.open()
+          end
+        end,
+      })
+    end
+  },
+  
+  -- 대시보드 플러그인 (선택사항)
+  {
+    "goolord/alpha-nvim",
+    event = "VimEnter",
+    config = function()
+      local alpha = require("alpha")
+      local dashboard = require("alpha.themes.dashboard")
+      
+      -- 헤더 (로고)
+      dashboard.section.header.val = {
+        "                                                     ",
+        "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
+        "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
+        "  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
+        "  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
+        "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
+        "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
+        "                                                     ",
+      }
+      
+      -- 메뉴 버튼
+      dashboard.section.buttons.val = {
+        dashboard.button("f", "󰈞  파일 찾기", ":Telescope find_files <CR>"),
+        dashboard.button("e", "  새 파일", ":ene <BAR> startinsert <CR>"),
+        dashboard.button("r", "󰄉  최근 파일", ":Telescope oldfiles <CR>"),
+        dashboard.button("g", "󰊢  Git 상태", ":LazyGit <CR>"),
+        dashboard.button("c", "  설정", ":e ~/.config/nvim/init.lua <CR>"),
+        dashboard.button("p", "  플러그인", ":Lazy <CR>"),
+        dashboard.button("q", "󰅚  종료", ":qa<CR>"),
+      }
+      
+      -- 푸터 (선택사항)
+      local function footer()
+        local stats = require("lazy").stats()
+        local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
+        return "⚡ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
+      end
+      
+      dashboard.section.footer.val = footer()
+      
+      -- 색상 설정
+      dashboard.section.header.opts.hl = "Include"
+      dashboard.section.buttons.opts.hl = "Keyword"
+      dashboard.section.footer.opts.hl = "Type"
+      
+      -- 레이아웃
+      dashboard.opts.layout[1].val = 8
+      
+      alpha.setup(dashboard.opts)
+      
+      -- 대시보드 자동 열기 설정
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimStarted",
+        callback = function()
+          dashboard.section.footer.val = footer()
+          pcall(vim.cmd.AlphaRedraw)
+        end,
+      })
+    end,
+  },
 })
 
 -- 색상 테마 적용 (Dracula 스타일)
@@ -350,17 +525,17 @@ require("nvim-tree").setup({
   },
 })
 
--- nvim 시작 시 자동으로 nvim-tree 열기 (비활성화)
+-- nvim 시작 시 처리 (대시보드가 처리하므로 주석 처리)
 -- vim.api.nvim_create_autocmd("VimEnter", {
---   callback = function(data)
---     -- 디렉토리가 아니거나 파일이 열린 경우에만 nvim-tree 열기
---     local directory = vim.fn.isdirectory(data.file) == 1
---     
---     if not directory then
---       require("nvim-tree.api").tree.open()
+--   callback = function()
+--     -- 인자 없이 nvim을 실행한 경우
+--     if vim.fn.argc() == 0 then
+--       -- 빈 버퍼를 스크래치 버퍼로 설정 (저장 요구 안함)
+--       vim.bo.buftype = 'nofile'
+--       vim.bo.bufhidden = 'hide'
+--       vim.bo.swapfile = false
 --     end
 --   end,
---   once = true,
 -- })
 
 -- 상태바 초기화 (Dracula Colorful 스타일)
@@ -461,15 +636,31 @@ require("telescope").setup({
   pickers = {
     find_files = {
       previewer = false, -- 파일 검색 시 미리보기 비활성화
+      -- 파일 검색 성능 개선
+      find_command = { "rg", "--files", "--hidden", "--glob", "!.git/*" },
+      -- 경로 포함 검색 활성화
+      path_display = { "smart" },
+      -- fuzzy 검색 개선
+      file_sorter = require("telescope.sorters").get_fzy_sorter,
+      -- 대소문자 구분 없이 검색
+      file_ignore_patterns = { "node_modules", ".git/", "%.jpg", "%.png", "%.jpeg", "%.pdf" },
     },
     live_grep = {
       previewer = false, -- 텍스트 검색 시 미리보기 비활성화
+      -- ripgrep 추가 옵션
+      additional_args = function()
+        return { "--hidden", "--no-heading", "--with-filename", "--line-number", "--column", "--smart-case" }
+      end,
+      -- 검색 결과 제한 (성능 향상)
+      max_results = 1000,
     },
     buffers = {
       layout_strategy = "horizontal",
       layout_config = {
         preview_width = 0.5, -- 버퍼 목록에서는 균등하게
       },
+      sort_mru = true, -- 최근 사용한 버퍼 우선 정렬
+      sort_lastused = true,
     },
     -- 레이아웃 전환 기능 설정
     layout_switcher = {
@@ -526,6 +717,26 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     -- Telescope 투명화
     vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "NONE", ctermbg = "NONE" })
     vim.api.nvim_set_hl(0, "TelescopeBorder", { bg = "NONE", ctermbg = "NONE" })
+    
+    -- Satellite 미니맵 투명화
+    vim.api.nvim_set_hl(0, "SatelliteBar", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteBackground", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteCursor", { fg = "#FF79C6", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteDiagnosticError", { fg = "#FF5555", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteDiagnosticWarn", { fg = "#FFB86C", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteDiagnosticInfo", { fg = "#8BE9FD", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteDiagnosticHint", { fg = "#BD93F9", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteGitSignsAdd", { fg = "#50FA7B", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteGitSignsChange", { fg = "#FFB86C", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteGitSignsDelete", { fg = "#FF5555", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteSearch", { fg = "#F1FA8C", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "SatelliteMark", { fg = "#BD93F9", bg = "NONE" })
+    
+    -- Mini.map 투명화 (사용 시)
+    vim.api.nvim_set_hl(0, "MiniMapNormal", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "MiniMapSymbolCount", { bg = "NONE", ctermbg = "NONE" })
+    vim.api.nvim_set_hl(0, "MiniMapSymbolLine", { fg = "#BD93F9", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "MiniMapSymbolView", { fg = "#8BE9FD", bg = "NONE" })
   end
 })
 
@@ -776,13 +987,48 @@ end, { desc = "Show references in Telescope" })
 vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show hover information" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+vim.keymap.set({"n", "v"}, "<leader>a", vim.lsp.buf.code_action, { desc = "빠른 액션 (Quick Fix)" })
 vim.keymap.set("n", "<leader>cf", function()
   vim.lsp.buf.format({ async = true })
   print("Formatting code with LSP")
 end, { desc = "Format code" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+vim.keymap.set("n", "<leader>ed", vim.diagnostic.open_float, { desc = "Show diagnostic" })
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+
+-- IntelliJ 스타일 진단 네비게이션
+vim.keymap.set("n", "<leader>e", function()
+  vim.diagnostic.goto_next({
+    severity = { min = vim.diagnostic.severity.HINT },
+    float = { border = "rounded", source = "always" },
+  })
+end, { desc = "다음 에러/경고로 이동" })
+
+vim.keymap.set("n", "<leader>E", function()
+  vim.diagnostic.goto_prev({
+    severity = { min = vim.diagnostic.severity.HINT },
+    float = { border = "rounded", source = "always" },
+  })
+end, { desc = "이전 에러/경고로 이동" })
+
+-- 에러만 네비게이션 (Option)
+vim.keymap.set("n", "<leader>en", function()
+  vim.diagnostic.goto_next({
+    severity = vim.diagnostic.severity.ERROR,
+    float = { border = "rounded", source = "always" },
+  })
+end, { desc = "다음 에러로만 이동" })
+
+vim.keymap.set("n", "<leader>ep", function()
+  vim.diagnostic.goto_prev({
+    severity = vim.diagnostic.severity.ERROR,
+    float = { border = "rounded", source = "always" },
+  })
+end, { desc = "이전 에러로만 이동" })
+
+-- 전체 진단 목록 보기
+vim.keymap.set("n", "<leader>el", vim.diagnostic.setloclist, { desc = "진단 목록 열기" })
+vim.keymap.set("n", "<leader>eq", vim.diagnostic.setqflist, { desc = "모든 진단 Quickfix 열기" })
 
 -- Trouble.nvim 단축키
 vim.keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { desc = "Toggle trouble" })
@@ -794,10 +1040,27 @@ vim.keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { desc = "Q
 -- 추가 단축키 설정
 vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true, silent = true }) -- 탐색기 토글
 vim.keymap.set("n", "<C-f>", ":Telescope find_files<CR>", { noremap = true, silent = true }) -- 파일 검색 (Ctrl+P에서 Ctrl+F로 변경)
-vim.keymap.set("n", "<leader>ff", ":Telescope find_files hidden=true no_ignore=true<CR>", { desc = "Find files (모든 파일 포함)" })
+vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "파일 검색 (기본)" }) -- ff를 기본 파일 검색으로
+vim.keymap.set("n", "<leader>fa", ":Telescope find_files hidden=true no_ignore=true<CR>", { desc = "모든 파일 검색 (숨김/무시 파일 포함)" }) -- fa를 모든 파일 검색으로
+vim.keymap.set("n", "<leader>fp", function()
+  require('telescope.builtin').find_files({
+    find_command = { 'fd', '--type', 'f', '--hidden', '--follow', '--exclude', '.git' },
+    path_display = { "truncate" },
+    file_sorter = require('telescope.sorters').get_fzy_sorter(),
+  })
+end, { desc = "파일 검색 (경로 포함)" }) -- fp는 경로 포함 검색으로 유지
 vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Live grep" })
 vim.keymap.set("n", "<leader>fb", ":Telescope buffers<CR>", { desc = "Find buffers" })
 vim.keymap.set("n", "<leader>fh", ":Telescope help_tags<CR>", { desc = "Help tags" })
+
+-- 추가 검색 단축키
+vim.keymap.set("n", "<leader>fw", ":Telescope grep_string<CR>", { desc = "현재 단어 검색" })
+vim.keymap.set("n", "<leader>fr", ":Telescope oldfiles<CR>", { desc = "최근 파일 열기" })
+vim.keymap.set("n", "<leader>fs", ":Telescope current_buffer_fuzzy_find<CR>", { desc = "현재 버퍼에서 검색" })
+vim.keymap.set("n", "<leader>fc", ":Telescope commands<CR>", { desc = "명령어 검색" })
+vim.keymap.set("n", "<leader>fk", ":Telescope keymaps<CR>", { desc = "키맵 검색" })
+vim.keymap.set("n", "<leader>fm", ":Telescope marks<CR>", { desc = "마크 검색" })
+vim.keymap.set("n", "<leader>fj", ":Telescope jumplist<CR>", { desc = "점프 리스트" })
 
 -- Comment.nvim 초기화
 require("Comment").setup({
@@ -1148,6 +1411,10 @@ vim.cmd [[
   augroup END
 ]]
 
+-- 설정 파일 리로드 단축키
+vim.keymap.set("n", "<leader>sv", ":source $MYVIMRC<CR>", { desc = "Neovim 설정 다시 로드" })
+vim.keymap.set("n", "<leader>se", ":e $MYVIMRC<CR>", { desc = "Neovim 설정 파일 열기" })
+
 -- 기타 유용한 단축키
 -- 스마트 저장: 파일명이 없으면 입력받고, 있으면 그냥 저장
 vim.keymap.set("n", "<leader>w", function()
@@ -1163,7 +1430,30 @@ vim.keymap.set("n", "<leader>w", function()
     vim.cmd('write')
   end
 end, { desc = "저장 (파일명 없으면 입력)", noremap = true, silent = true })
-vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "종료", noremap = true, silent = true })
+
+-- 스마트 종료: 빈 버퍼이고 수정사항이 없으면 바로 종료
+vim.keymap.set("n", "<leader>q", function()
+  local success, result = pcall(function()
+    local buf_name = vim.fn.expand('%')
+    local buf_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    local is_empty = #buf_lines == 1 and buf_lines[1] == ""
+    
+    -- 파일명이 없고, 내용이 비어있으면 강제 종료
+    if buf_name == '' and is_empty then
+      return 'q!'
+    else
+      return 'q'
+    end
+  end)
+  
+  if success then
+    vim.cmd(result)
+  else
+    -- 에러 발생 시 일반 종료 시도
+    vim.cmd('q')
+  end
+end, { desc = "스마트 종료", noremap = true, silent = true })
+
 vim.keymap.set("n", "<leader>Q", ":q!<CR>", { desc = "강제 종료", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "버퍼 닫기", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>bD", ":bd!<CR>", { desc = "버퍼 강제 닫기", noremap = true, silent = true })
@@ -1389,6 +1679,19 @@ require("which-key").setup({
   },
 })
 
+-- quit 명령어 개선 (빈 버퍼 자동 처리)
+vim.api.nvim_create_user_command('Q', function()
+  local buf_name = vim.fn.expand('%')
+  local buf_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local is_empty = #buf_lines == 1 and buf_lines[1] == ""
+  
+  if buf_name == '' and is_empty then
+    vim.cmd('q!')
+  else
+    vim.cmd('q')
+  end
+end, { desc = "스마트 종료" })
+
 -- 테마 로드 후 즉시 투명 배경 적용
 vim.cmd([[
   hi Normal guibg=NONE ctermbg=NONE
@@ -1407,4 +1710,24 @@ vim.cmd([[
   hi NvimTreeWinSeparator guibg=NONE ctermbg=NONE
   hi TelescopeNormal guibg=NONE ctermbg=NONE
   hi TelescopeBorder guibg=NONE ctermbg=NONE
+  
+  " Satellite 미니맵 투명 배경
+  hi SatelliteBar guibg=NONE ctermbg=NONE
+  hi SatelliteBackground guibg=NONE ctermbg=NONE
+  hi SatelliteCursor guifg=#FF79C6 guibg=NONE
+  hi SatelliteDiagnosticError guifg=#FF5555 guibg=NONE
+  hi SatelliteDiagnosticWarn guifg=#FFB86C guibg=NONE
+  hi SatelliteDiagnosticInfo guifg=#8BE9FD guibg=NONE
+  hi SatelliteDiagnosticHint guifg=#BD93F9 guibg=NONE
+  hi SatelliteGitSignsAdd guifg=#50FA7B guibg=NONE
+  hi SatelliteGitSignsChange guifg=#FFB86C guibg=NONE
+  hi SatelliteGitSignsDelete guifg=#FF5555 guibg=NONE
+  hi SatelliteSearch guifg=#F1FA8C guibg=NONE
+  hi SatelliteMark guifg=#BD93F9 guibg=NONE
+  
+  " Mini.map 투명 배경 (사용 시)
+  hi MiniMapNormal guibg=NONE ctermbg=NONE
+  hi MiniMapSymbolCount guibg=NONE ctermbg=NONE
+  hi MiniMapSymbolLine guifg=#BD93F9 guibg=NONE
+  hi MiniMapSymbolView guifg=#8BE9FD guibg=NONE
 ]])
