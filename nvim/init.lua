@@ -10,7 +10,7 @@ vim.g.maplocalleader = " " -- 로컬 리더 키도 스페이스바로 설정
 
 -- 기본 옵션
 vim.opt.number = true
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false  -- 상대 줄 번호 비활성화 (절대 줄 번호만 표시)
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
@@ -384,25 +384,31 @@ require("lazy").setup({
       
       -- 헤더 (로고)
       dashboard.section.header.val = {
-        "                                                     ",
-        "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
-        "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
-        "  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
-        "  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
-        "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
-        "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
-        "                                                     ",
+        "",
+        "                        Small Team. Huge Impact.",
+        "",
+        "░▒▓█▓▒░▒▓███████▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░",
+        "░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░",
+        "░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░",
+        "░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░   ░▒▓██████▓▒░ ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░",
+        "░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░",
+        "░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░",
+        "░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░   ░▒▓████████▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓█▓▒░",
+        "",
+        "░▒▓████████▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓██████▓▒░▒▓████████▓▒░",
+        "░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░    ",
+        "░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░        ░▒▓█▓▒░    ",
+        "░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░        ░▒▓█▓▒░    ",
+        "░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░        ░▒▓█▓▒░    ",
+        "░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░ ░▒▓█▓▒░    ",
+        "░▒▓████████▓▒░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓████████▓▒░▒▓██████▓▒░  ░▒▓█▓▒░   ░▒▓██████▓▒░",
+        "",
+        "",
       }
       
-      -- 메뉴 버튼
+      -- 메뉴 버튼 (비활성화)
       dashboard.section.buttons.val = {
-        dashboard.button("f", "󰈞  파일 찾기", ":Telescope find_files <CR>"),
-        dashboard.button("e", "  새 파일", ":ene <BAR> startinsert <CR>"),
-        dashboard.button("r", "󰄉  최근 파일", ":Telescope oldfiles <CR>"),
-        dashboard.button("g", "󰊢  Git 상태", ":LazyGit <CR>"),
-        dashboard.button("c", "  설정", ":e ~/.config/nvim/init.lua <CR>"),
-        dashboard.button("p", "  플러그인", ":Lazy <CR>"),
-        dashboard.button("q", "󰅚  종료", ":qa<CR>"),
+        -- 버튼을 원하지 않으면 빈 테이블로 설정
       }
       
       -- 푸터 (선택사항)
@@ -415,9 +421,9 @@ require("lazy").setup({
       dashboard.section.footer.val = footer()
       
       -- 색상 설정
-      dashboard.section.header.opts.hl = "Include"
+      dashboard.section.header.opts.hl = "Title"  -- 더 밝은 색상으로 변경
       dashboard.section.buttons.opts.hl = "Keyword"
-      dashboard.section.footer.opts.hl = "Type"
+      dashboard.section.footer.opts.hl = "Comment"
       
       -- 레이아웃
       dashboard.opts.layout[1].val = 8
@@ -2031,6 +2037,13 @@ vim.api.nvim_create_user_command('Q', function()
     vim.cmd('q')
   end
 end, { desc = "스마트 종료" })
+
+-- Alpha 대시보드 유니콘 색상
+vim.cmd([[
+  hi AlphaUnicorn guifg=#FF79C6 gui=bold
+  hi AlphaCompany guifg=#8BE9FD gui=bold
+  hi AlphaMagic guifg=#F1FA8C gui=italic
+]])
 
 -- 테마 로드 후 즉시 투명 배경 적용
 vim.cmd([[
