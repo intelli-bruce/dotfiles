@@ -436,6 +436,33 @@ require("lazy").setup({
         callback = function()
           dashboard.section.footer.val = footer()
           pcall(vim.cmd.AlphaRedraw)
+          
+          -- 대시보드 로드 후 nvim-tree 자동 열기
+          vim.defer_fn(function()
+            if vim.bo.filetype == "alpha" then
+              require("nvim-tree.api").tree.open()
+            end
+          end, 100)
+        end,
+      })
+      
+      -- nvim 시작 시 특정 조건에서만 대시보드와 nvim-tree 함께 열기
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          -- 조건: 인수 없음, 빈 버퍼, 인서트 모드 아님, 파이프 입력 없음
+          local should_open_dashboard = vim.fn.argc() == 0 
+            and vim.fn.line2byte("$") == -1 
+            and not vim.o.insertmode
+            and vim.fn.empty(vim.v.stdin_data) == 1  -- 파이프 입력 체크
+          
+          if should_open_dashboard then
+            vim.defer_fn(function()
+              -- alpha 대시보드가 현재 버퍼인지 확인 후 nvim-tree 열기
+              if vim.bo.filetype == "alpha" then
+                require("nvim-tree.api").tree.open()
+              end
+            end, 200)  -- 딜레이를 200ms로 증가
+          end
         end,
       })
     end,
@@ -505,11 +532,14 @@ vim.api.nvim_command("highlight MinimapRange ctermfg=228 ctermbg=59 guifg=#F8F8F
 -- nvim-tree 초기화
 require("nvim-tree").setup({
   view = {
-    width = 40,  -- 패널 너비 설정 (기본값: 30)
-    side = "left",  -- 패널 위치
+    width = 45,  -- 패널 너비 설정 (40에서 35로 조정)
+    side = "left",  -- 패널 위치 ("left", "right", "top", "bottom" 중 선택)
     preserve_window_proportions = false,
     number = false,
     relativenumber = false,
+    float = {
+      enable = false,  -- 플로팅 모드 비활성화 (고정 패널)
+    },
   },
   renderer = {
     icons = {
