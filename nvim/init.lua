@@ -1,3 +1,9 @@
+-- 중복 로드 방지
+if vim.g.init_lua_loaded then
+  return
+end
+vim.g.init_lua_loaded = true
+
 -- 리더 키 설정 (반드시 다른 설정보다 먼저 로드되어야 함)
 vim.g.mapleader = " " -- 스페이스바를 리더 키로 설정
 vim.g.maplocalleader = " " -- 로컬 리더 키도 스페이스바로 설정
@@ -22,6 +28,8 @@ vim.opt.smartcase = true -- 대문자가 포함된 경우 대소문자 구분
 vim.opt.hlsearch = true -- 검색 결과 강조
 vim.opt.incsearch = true -- 증분 검색
 vim.opt.autoread = true -- 외부에서 파일이 변경되면 자동으로 다시 로드
+vim.opt.timeoutlen = 300 -- 키 시퀀스 대기 시간 (leader 키 지연 감소)
+vim.opt.shada = "!,'1000,<50,s10,h" -- 최근 파일 1000개까지 기억
 
 -- netrw 비활성화 (nvim-tree와 충돌 방지)
 vim.g.loaded_netrw = 1
@@ -196,6 +204,82 @@ require("lazy").setup({
 
   { "rafamadriz/friendly-snippets" }, -- 추가 스니펫 컬렉션
   
+  -- Flutter 개발 도구
+  {
+    "akinsho/flutter-tools.nvim",
+    lazy = false,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "stevearc/dressing.nvim", -- UI 개선
+    },
+    config = function()
+      require("flutter-tools").setup({
+        ui = {
+          border = "rounded",
+          notification_style = "native",
+        },
+        decorations = {
+          statusline = {
+            app_version = true,
+            device = true,
+          },
+        },
+        widget_guides = {
+          enabled = true,
+        },
+        closing_tags = {
+          highlight = "Comment",
+          prefix = "// ",
+          enabled = true,
+        },
+        lsp = {
+          color = {
+            enabled = true,
+            background = true,
+            virtual_text = true,
+          },
+          on_attach = on_attach,
+          capabilities = capabilities,
+          settings = {
+            showTodos = true,
+            completeFunctionCalls = true,
+            enableSnippets = true,
+          },
+        },
+        debugger = {
+          enabled = false, -- 디버거 사용시 true
+          run_via_dap = false,
+        },
+      })
+    end,
+  },
+  
+  -- Code Action 개선 플러그인 (더 안정적인 버전)
+  {
+    "aznhe21/actions-preview.nvim",
+    config = function()
+      require("actions-preview").setup({
+        diff = {
+          algorithm = "patience",
+          ignore_whitespace = true,
+        },
+        telescope = {
+          sorting_strategy = "ascending",
+          layout_strategy = "vertical",
+          layout_config = {
+            width = 0.8,
+            height = 0.9,
+            prompt_position = "top",
+            preview_cutoff = 20,
+            preview_height = function(_, _, max_lines)
+              return max_lines - 15
+            end,
+          },
+        },
+      })
+    end,
+  },
+  
   -- 미니맵 플러그인 옵션 1: Satellite (스크롤바 스타일)
   {
     "lewis6991/satellite.nvim",
@@ -350,6 +434,29 @@ require("lazy").setup({
       })
     end,
   },
+}, {
+  -- Lazy.nvim 옵션
+  install = {
+    missing = true,
+    colorscheme = { "dracula" },
+  },
+  checker = {
+    enabled = true,
+    notify = false,
+  },
+  change_detection = {
+    enabled = true,
+    notify = false,
+  },
+  performance = {
+    cache = {
+      enabled = true,
+    },
+    reset_packpath = true,
+    rtp = {
+      reset = true,
+    },
+  },
 })
 
 -- 색상 테마 적용 (Dracula 스타일)
@@ -383,9 +490,7 @@ vim.api.nvim_command("highlight SpecialKey guifg=#CCCCCC")
 vim.api.nvim_command("highlight Whitespace guifg=#444444") -- 탭, 공백 등 표시
 vim.api.nvim_command("highlight LineNr guifg=#AAAAAA") -- 라인 번호
 
--- Indent-Blankline 하이라이팅 추가 (얇은 선을 위한 설정)
-vim.api.nvim_command("highlight IblIndent guifg=#3B4048 gui=nocombine")
-vim.api.nvim_command("highlight IblScope guifg=#BD93F9 gui=nocombine") -- 더 밝은 보라색으로 변경
+-- Indent-Blankline 하이라이팅은 플러그인 설정 후에 정의됨
 
 -- minimap 관련 색상 설정 (Dracula 테마와 어울리게)
 vim.api.nvim_command("highlight MinimapCursor ctermfg=228 ctermbg=59 guifg=#F8F8F2 guibg=#6272A4")
@@ -762,17 +867,104 @@ require("mason-lspconfig").setup({
     "clangd",        -- C/C++
     "marksman",      -- Markdown
     "jsonls",        -- JSON
+    "dartls",        -- Dart/Flutter
   },
   automatic_installation = true,
+  -- 자동 서버 설정 비활성화 (수동으로 설정)
+  handlers = nil,
 })
 
 -- LSP 설정
 local lspconfig = require("lspconfig")
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
+-- 전역 on_attach 함수 (모든 LSP 서버에 적용)
+local on_attach = function(client, bufnr)
+  -- 버퍼별 활성 클라이언트 확인
+  local active_clients = vim.lsp.get_active_clients({ bufnr = bufnr })
+  
+  -- 같은 이름의 클라이언트가 이미 있는지 확인
+  local client_names = {}
+  for _, c in ipairs(active_clients) do
+    if client_names[c.name] and c.id ~= client.id then
+      -- 중복 클라이언트 발견 - 새로운 것을 중지
+      vim.notify("Duplicate LSP client detected: " .. client.name .. ", stopping...", vim.log.levels.WARN)
+      vim.schedule(function()
+        client.stop()
+      end)
+      return
+    end
+    client_names[c.name] = true
+  end
+  
+  -- TypeScript 특별 처리
+  if client.name == "ts_ls" or client.name == "tsserver" then
+    -- 포맷팅은 prettier 등 별도 도구 사용
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end
+end
+
+-- 중복 진단 필터링 함수
+local function filter_duplicate_diagnostics()
+  local function dedupe_diagnostics(diagnostics)
+    local seen = {}
+    local result = {}
+    
+    for _, diagnostic in ipairs(diagnostics) do
+      -- 진단 메시지와 위치를 기준으로 중복 확인
+      local key = string.format("%s:%d:%d:%s", 
+        diagnostic.source or "unknown",
+        diagnostic.lnum or 0,
+        diagnostic.col or 0,
+        diagnostic.message or ""
+      )
+      
+      if not seen[key] then
+        seen[key] = true
+        table.insert(result, diagnostic)
+      end
+    end
+    
+    return result
+  end
+  
+  -- 진단 핸들러 오버라이드
+  local orig_handler = vim.diagnostic.handlers["virtual_text"]
+  vim.diagnostic.handlers["virtual_text"] = {
+    show = function(namespace, bufnr, diagnostics, opts)
+      local filtered = dedupe_diagnostics(diagnostics)
+      if orig_handler and orig_handler.show then
+        orig_handler.show(namespace, bufnr, filtered, opts)
+      end
+    end,
+    hide = orig_handler and orig_handler.hide,
+  }
+end
+
+-- 중복 진단 필터 적용
+filter_duplicate_diagnostics()
+
+-- 진단 설정
+vim.diagnostic.config({
+  virtual_text = {
+    source = "if_many",  -- 여러 소스가 있을 때만 소스 표시
+    prefix = "●",
+  },
+  float = {
+    source = "always",
+    border = "rounded",
+  },
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+})
+
 -- LSP 서버 설정
 lspconfig.lua_ls.setup({
   capabilities = capabilities,
+  on_attach = on_attach,
   settings = {
     Lua = {
       diagnostics = {
@@ -791,11 +983,18 @@ lspconfig.lua_ls.setup({
 
 lspconfig.pyright.setup({
   capabilities = capabilities,
+  on_attach = on_attach,
 })
 
 -- TypeScript/JavaScript 설정 (tsserver -> ts_ls로 서버 이름 변경)
 lspconfig.ts_ls.setup({
   capabilities = capabilities,
+  on_attach = on_attach,
+  single_file_support = false,  -- 단일 파일 지원 비활성화로 중복 방지
+  root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
+  filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+  -- 한 프로젝트에 하나의 서버만 실행
+  autostart = true,
   settings = {
     typescript = {
       inlayHints = {
@@ -806,6 +1005,13 @@ lspconfig.ts_ls.setup({
         includeInlayPropertyDeclarationTypeHints = true,
         includeInlayFunctionLikeReturnTypeHints = true,
         includeInlayEnumMemberValueHints = true,
+      },
+      -- 중복 진단 방지
+      format = {
+        enable = false,  -- 포맷터는 별도로 사용
+      },
+      validate = {
+        enable = true,
       },
     },
     javascript = {
@@ -818,29 +1024,78 @@ lspconfig.ts_ls.setup({
         includeInlayFunctionLikeReturnTypeHints = true,
         includeInlayEnumMemberValueHints = true,
       },
+      -- 중복 진단 방지
+      format = {
+        enable = false,
+      },
+      validate = {
+        enable = true,
+      },
+    },
+    -- 중복 진단 필터링
+    completions = {
+      completeFunctionCalls = true,
+    },
+    diagnostics = {
+      ignoredCodes = {},  -- 중복되는 진단 코드가 있으면 여기에 추가
     },
   },
 })
 
 lspconfig.rust_analyzer.setup({
   capabilities = capabilities,
+  on_attach = on_attach,
 })
 
 lspconfig.clangd.setup({
   capabilities = capabilities,
+  on_attach = on_attach,
 })
 
 lspconfig.marksman.setup({
   capabilities = capabilities,
+  on_attach = on_attach,
 })
 
 lspconfig.jsonls.setup({
   capabilities = capabilities,
+  on_attach = on_attach,
   filetypes = { "json", "jsonc" },
   settings = {
     json = {
       schemas = require('schemastore').json.schemas(),
       validate = { enable = true },
+    },
+  },
+})
+
+-- Dart/Flutter 설정
+lspconfig.dartls.setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+  cmd = { "dart", "language-server", "--protocol=lsp" },
+  filetypes = { "dart" },
+  root_dir = lspconfig.util.root_pattern("pubspec.yaml", ".git"),
+  init_options = {
+    closingLabels = true,
+    flutterOutline = true,
+    onlyAnalyzeProjectsWithOpenFiles = false,
+    outline = true,
+    suggestFromUnimportedLibraries = true,
+  },
+  settings = {
+    dart = {
+      completeFunctionCalls = true,
+      showTodos = true,
+      enableSnippets = true,
+      enableSdkFormatter = true,
+      lineLength = 80,
+      devToolsPort = 9100,
+      devToolsReuseWindows = true,
+      analysisExcludedFolders = {
+        vim.fn.expand("$HOME/.pub-cache"),
+        vim.fn.expand("$HOME/fvm"),
+      },
     },
   },
 })
@@ -986,8 +1241,52 @@ vim.keymap.set("n", "gr", function()
 end, { desc = "Show references in Telescope" })
 vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show hover information" })
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
-vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
-vim.keymap.set({"n", "v"}, "<leader>a", vim.lsp.buf.code_action, { desc = "빠른 액션 (Quick Fix)" })
+
+-- Code Action 중복 제거 함수
+local function dedupe_code_actions(actions)
+  local seen = {}
+  local result = {}
+  
+  for _, action in ipairs(actions) do
+    local key = action.title .. (action.kind or "")
+    if not seen[key] then
+      seen[key] = true
+      table.insert(result, action)
+    end
+  end
+  
+  return result
+end
+
+-- Code Action 설정 (개선된 UI 사용)
+vim.keymap.set("n", "<leader>ca", function()
+  local ok, actions_preview = pcall(require, "actions-preview")
+  if ok then
+    actions_preview.code_actions()
+  else
+    vim.lsp.buf.code_action({
+      filter = function(action)
+        return action
+      end,
+      apply = false,
+    })
+  end
+end, { desc = "Code action (미리보기)" })
+
+vim.keymap.set({"n", "v"}, "<leader>a", function()
+  -- actions-preview가 로드되지 않았으면 기본 code action 사용
+  local ok, actions_preview = pcall(require, "actions-preview")
+  if ok then
+    actions_preview.code_actions()
+  else
+    vim.lsp.buf.code_action({
+      filter = function(action)
+        return action
+      end,
+      apply = false,
+    })
+  end
+end, { desc = "빠른 액션 (Quick Fix)" })
 vim.keymap.set("n", "<leader>cf", function()
   vim.lsp.buf.format({ async = true })
   print("Formatting code with LSP")
@@ -1055,7 +1354,16 @@ vim.keymap.set("n", "<leader>fh", ":Telescope help_tags<CR>", { desc = "Help tag
 
 -- 추가 검색 단축키
 vim.keymap.set("n", "<leader>fw", ":Telescope grep_string<CR>", { desc = "현재 단어 검색" })
-vim.keymap.set("n", "<leader>fr", ":Telescope oldfiles<CR>", { desc = "최근 파일 열기" })
+vim.keymap.set("n", "<leader>fr", function()
+  require('telescope.builtin').oldfiles({
+    prompt_title = "최근 파일",
+    cwd_only = false,  -- 모든 디렉토리의 파일 표시
+    initial_mode = "normal",  -- 노멀 모드로 시작 (j/k로 이동 가능)
+    layout_config = {
+      preview_width = 0.6,
+    },
+  })
+end, { desc = "최근 파일 열기" })
 vim.keymap.set("n", "<leader>fs", ":Telescope current_buffer_fuzzy_find<CR>", { desc = "현재 버퍼에서 검색" })
 vim.keymap.set("n", "<leader>fc", ":Telescope commands<CR>", { desc = "명령어 검색" })
 vim.keymap.set("n", "<leader>fk", ":Telescope keymaps<CR>", { desc = "키맵 검색" })
@@ -1272,20 +1580,22 @@ require("ibl").setup({
   indent = {
     char = "│",
     tab_char = "│",
-    highlight = { "IblIndent" },
   },
   scope = {
     enabled = true,
     show_start = false,
     show_end = false,
-    highlight = { "IblScope" },
     priority = 500, -- 높은 우선순위로 스코프 선이 잘 보이도록
   },
   exclude = {
-    filetypes = { "help", "dashboard", "NvimTree", "Trouble", "lazy", "mason" },
+    filetypes = { "help", "dashboard", "NvimTree", "Trouble", "lazy", "mason", "alpha" },
     buftypes = { "terminal", "nofile", "quickfix", "prompt" },
   },
 })
+
+-- ibl 하이라이트 그룹 설정 (플러그인 설정 후)
+vim.api.nvim_set_hl(0, "IblIndent", { fg = "#3B4048", nocombine = true })
+vim.api.nvim_set_hl(0, "IblScope", { fg = "#BD93F9", nocombine = true })
 
 -- Autopairs 초기화
 require("nvim-autopairs").setup()
@@ -1354,7 +1664,8 @@ require("nvim-treesitter.configs").setup({
     "python", "javascript", "typescript", "tsx", -- 웹/앱 개발
     "html", "css", "json", "yaml", "toml", -- 마크업/데이터
     "rust", "c", "cpp", -- 시스템 프로그래밍
-    "markdown", "markdown_inline" -- 추가 언어
+    "markdown", "markdown_inline", -- 추가 언어
+    "dart" -- Dart/Flutter
   },
   sync_install = false,
   auto_install = true,
@@ -1412,8 +1723,36 @@ vim.cmd [[
 ]]
 
 -- 설정 파일 리로드 단축키
-vim.keymap.set("n", "<leader>sv", ":source $MYVIMRC<CR>", { desc = "Neovim 설정 다시 로드" })
+vim.keymap.set("n", "<leader>sv", function()
+  -- 가드 초기화 후 설정 리로드
+  vim.g.init_lua_loaded = false
+  vim.cmd("source $MYVIMRC")
+  vim.notify("설정 리로드 완료", vim.log.levels.INFO)
+end, { desc = "Neovim 설정 다시 로드" })
+
 vim.keymap.set("n", "<leader>se", ":e $MYVIMRC<CR>", { desc = "Neovim 설정 파일 열기" })
+
+-- Lazy 관련 단축키
+vim.keymap.set("n", "<leader>ps", ":Lazy sync<CR>", { desc = "플러그인 동기화" })
+vim.keymap.set("n", "<leader>pu", ":Lazy update<CR>", { desc = "플러그인 업데이트" })
+vim.keymap.set("n", "<leader>pc", ":Lazy clean<CR>", { desc = "사용하지 않는 플러그인 제거" })
+vim.keymap.set("n", "<leader>pp", ":Lazy<CR>", { desc = "플러그인 관리자 열기" })
+
+-- LSP 디버깅 명령어
+vim.keymap.set("n", "<leader>li", ":LspInfo<CR>", { desc = "LSP 정보 보기" })
+vim.keymap.set("n", "<leader>lr", ":LspRestart<CR>", { desc = "LSP 재시작" })
+vim.keymap.set("n", "<leader>ls", function()
+  local clients = vim.lsp.get_active_clients()
+  if #clients == 0 then
+    print("No active LSP clients")
+    return
+  end
+  
+  print("Active LSP clients:")
+  for _, client in ipairs(clients) do
+    print(string.format("  - %s (id: %d)", client.name, client.id))
+  end
+end, { desc = "활성 LSP 클라이언트 목록" })
 
 -- 기타 유용한 단축키
 -- 스마트 저장: 파일명이 없으면 입력받고, 있으면 그냥 저장
@@ -1637,15 +1976,16 @@ require("which-key").setup({
       suggestions = 20,
     },
     presets = {
-      operators = true,
-      motions = true,
-      text_objects = true,
+      operators = false,  -- 비활성화로 지연 감소
+      motions = false,    -- 비활성화로 지연 감소
+      text_objects = false,
       windows = true,
       nav = true,
       z = true,
       g = true,
     },
   },
+  delay = 0,  -- which-key 표시 지연 제거
   icons = {
     breadcrumb = "»", -- 경로 구분자 아이콘
     separator = "➜", -- 그룹 구분자 아이콘
