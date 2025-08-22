@@ -129,3 +129,5 @@ export PATH="$HOME/.claude/local:$PATH"
 
 # Initialize zoxide (better cd)
 eval "$(zoxide init zsh)"
+
+alias claude="/Users/brucechoe/.claude/local/claude"
