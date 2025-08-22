@@ -8,15 +8,49 @@ vim.g.init_lua_loaded = true
 vim.g.mapleader = " " -- 스페이스바를 리더 키로 설정
 vim.g.maplocalleader = " " -- 로컬 리더 키도 스페이스바로 설정
 
+-- Leader 키를 누를 때 자동으로 영문으로 전환
+vim.keymap.set({'n', 'v', 'x', 's', 'o'}, '<Space>', function()
+  -- im-select를 사용하여 영문(ABC)으로 전환
+  vim.fn.system('im-select com.apple.keylayout.ABC')
+  -- 원래 leader 키 기능 수행
+  return '<Space>'
+end, { expr = true, silent = true, desc = "Switch to English and act as leader" })
+
+-- Normal 모드 진입 시 자동으로 영문으로 전환 (ESC 키)
+vim.api.nvim_create_autocmd("InsertLeave", {
+  pattern = "*",
+  callback = function()
+    -- 현재 입력 방법 저장
+    vim.b.input_method = vim.fn.system('im-select'):gsub('\n', '')
+    -- 영문으로 전환
+    vim.fn.system('im-select com.apple.keylayout.ABC')
+  end,
+  desc = "Switch to English when leaving Insert mode"
+})
+
+-- Insert 모드 진입 시 이전 입력 방법으로 복원
+vim.api.nvim_create_autocmd("InsertEnter", {
+  pattern = "*",
+  callback = function()
+    -- 이전에 저장된 입력 방법이 있으면 복원
+    if vim.b.input_method and vim.b.input_method ~= '' then
+      vim.fn.system('im-select ' .. vim.b.input_method)
+    end
+  end,
+  desc = "Restore previous input method when entering Insert mode"
+})
+
 -- 기본 옵션
 vim.opt.number = true
 vim.opt.relativenumber = false  -- 상대 줄 번호 비활성화 (절대 줄 번호만 표시)
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.mouse = "a"
 vim.opt.clipboard = "unnamedplus"
-vim.opt.signcolumn = "yes" -- 사인 컬럼 항상 표시 (LSP 진단용)
+vim.opt.signcolumn = "yes" -- 사인 컬럼 표시
+vim.opt.numberwidth = 4 -- 줄 번호 컬럼 너비 (기본값)
+vim.opt.fillchars = "eob: ,fold: ,foldopen:▾,foldsep: ,foldclose:▸" -- 빈 공간 문자 설정
 vim.opt.updatetime = 300 -- 더 빠른 업데이트 시간 (기본값은 4000ms)
 vim.opt.cursorline = true -- 현재 라인 강조
 vim.opt.wrap = false -- 라인 래핑 비활성화
@@ -103,7 +137,29 @@ require("lazy").setup({
   { "numToStr/Comment.nvim", opts = {} },
   { "lewis6991/gitsigns.nvim", opts = {} },
   { "RRethy/vim-illuminate" },
-  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
+  { 
+    "lukas-reineke/indent-blankline.nvim", 
+    main = "ibl",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      -- 하이라이트 그룹 설정
+      vim.api.nvim_set_hl(0, "IblIndent", { fg = "#2A2D37" })
+      vim.api.nvim_set_hl(0, "IblScope", { fg = "#6272A4", bold = true })
+      
+      require("ibl").setup({
+        indent = {
+          char = "┊",
+        },
+        scope = {
+          enabled = true,
+          char = "┊",
+          show_start = true,
+          show_end = true,
+          highlight = "IblScope",
+        },
+      })
+    end,
+  },
   { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
   -- { "github/copilot.vim" }, -- 기존 VimScript 버전 (비활성화)
@@ -495,6 +551,31 @@ require("lazy").setup({
 -- 색상 테마 적용 (Dracula 스타일)
 vim.cmd("colorscheme dracula")
 
+-- nvim-tree 색상을 즉시 적용
+vim.defer_fn(function()
+  vim.cmd("highlight NvimTreeNormal guibg=#2A2D37")  -- 트리 패널 배경색 (약간 밝은 회색)
+  vim.cmd("highlight NvimTreeNormalNC guibg=#2A2D37")  -- 비활성 상태 트리 패널
+  vim.cmd("highlight NvimTreeWinSeparator guifg=#44475A guibg=#2A2D37")  -- 트리 패널 구분선
+  vim.cmd("highlight NvimTreeEndOfBuffer guibg=#2A2D37")  -- 버퍼 끝 부분
+  vim.cmd("highlight NvimTreeCursorLine guibg=#383C4A")  -- 커서 라인 (더 밝게)
+  vim.cmd("highlight NvimTreeFolderIcon guifg=#8BE9FD")  -- 폴더 아이콘 색상
+  vim.cmd("highlight NvimTreeFolderName guifg=#8BE9FD")  -- 폴더 이름 색상
+  vim.cmd("highlight NvimTreeOpenedFolderName guifg=#50FA7B")  -- 열린 폴더 색상
+  vim.cmd("highlight NvimTreeEmptyFolderName guifg=#6272A4")  -- 빈 폴더 색상
+  vim.cmd("highlight NvimTreeRootFolder guifg=#F1FA8C gui=bold")  -- 루트 폴더 (노란색, 굵게)
+  vim.cmd("highlight NvimTreeGitDirty guifg=#FFB86C")  -- Git 변경된 파일
+  vim.cmd("highlight NvimTreeGitNew guifg=#50FA7B")  -- Git 새 파일
+  vim.cmd("highlight NvimTreeGitDeleted guifg=#FF5555")  -- Git 삭제된 파일
+  
+  -- Indent-Blankline 색상도 함께 적용
+  vim.cmd("highlight IblIndent guifg=#2A2D37")  -- 매우 연한 회색
+  vim.cmd("highlight IblScope guifg=#6272A4")  -- 현재 스코프는 보라색으로 강조
+  
+  -- Cursorline 설정 재적용
+  vim.cmd("highlight CursorLine cterm=NONE ctermbg=234 guibg=#323442")
+  vim.cmd("highlight CursorLineNr cterm=bold ctermfg=226 guifg=#F1FA8C gui=bold")
+end, 100)  -- 100ms 딜레이 후 적용
+
 -- Dracula Colorful 스타일을 위한 추가 하이라이팅 설정
 -- 기본 텍스트 색상을 약간 더 어둡게 변경 (#F8F8F2 -> #E6E6E6)
 -- 배경을 투명하게 설정 (guibg=NONE)
@@ -503,7 +584,8 @@ vim.api.nvim_command("highlight NormalFloat guifg=#E6E6E6 guibg=NONE ctermbg=NON
 vim.api.nvim_command("highlight NormalNC guifg=#CCCCCC guibg=NONE ctermbg=NONE")
 
 vim.api.nvim_command("highlight Comment ctermfg=61 guifg=#6272A4")
-vim.api.nvim_command("highlight CursorLine ctermbg=234 guibg=#44475A")
+vim.api.nvim_command("highlight CursorLine cterm=NONE ctermbg=234 guibg=#323442")
+vim.api.nvim_command("highlight CursorLineNr cterm=bold ctermfg=226 guifg=#F1FA8C gui=bold")
 vim.api.nvim_command("highlight Visual ctermbg=61 guibg=#3E4452")
 vim.api.nvim_command("highlight Search ctermbg=180 ctermfg=16 guibg=#FFB86C guifg=#282A36")
 vim.api.nvim_command("highlight IncSearch ctermbg=169 ctermfg=16 guibg=#FF79C6 guifg=#282A36")
@@ -521,13 +603,38 @@ vim.api.nvim_command("highlight Type ctermfg=84 guifg=#50FA7B")
 vim.api.nvim_command("highlight NonText guifg=#CCCCCC")
 vim.api.nvim_command("highlight SpecialKey guifg=#CCCCCC")
 vim.api.nvim_command("highlight Whitespace guifg=#444444") -- 탭, 공백 등 표시
-vim.api.nvim_command("highlight LineNr guifg=#AAAAAA") -- 라인 번호
+vim.api.nvim_command("highlight LineNr guifg=#6272A4") -- 라인 번호 (더 연한 보라색)
+vim.api.nvim_command("highlight SignColumn guibg=NONE") -- 사인 컬럼 배경 투명
 
--- Indent-Blankline 하이라이팅은 플러그인 설정 후에 정의됨
+-- Indent-Blankline 하이라이팅
+vim.api.nvim_command("highlight IblIndent guifg=#2A2D37")  -- 매우 연한 회색
+vim.api.nvim_command("highlight IblScope guifg=#6272A4")  -- 현재 스코프는 보라색으로 강조
 
 -- minimap 관련 색상 설정 (Dracula 테마와 어울리게)
 vim.api.nvim_command("highlight MinimapCursor ctermfg=228 ctermbg=59 guifg=#F8F8F2 guibg=#6272A4")
 vim.api.nvim_command("highlight MinimapRange ctermfg=228 ctermbg=59 guifg=#F8F8F2 guibg=#44475A")
+
+-- nvim-tree 색상 설정을 autocmd로 나중에 적용
+vim.api.nvim_create_autocmd("ColorScheme", {
+  pattern = "*",
+  callback = function()
+    -- nvim-tree 색상 설정 (패널 배경을 약간 밝게)
+    vim.cmd("highlight NvimTreeNormal guibg=#2A2D37")  -- 트리 패널 배경색 (약간 밝은 회색)
+    vim.cmd("highlight NvimTreeNormalNC guibg=#2A2D37")  -- 비활성 상태 트리 패널
+    vim.cmd("highlight NvimTreeWinSeparator guifg=#44475A guibg=#2A2D37")  -- 트리 패널 구분선
+    vim.cmd("highlight NvimTreeEndOfBuffer guibg=#2A2D37")  -- 버퍼 끝 부분
+    vim.cmd("highlight NvimTreeCursorLine guibg=#383C4A")  -- 커서 라인 (더 밝게)
+    vim.cmd("highlight NvimTreeFolderIcon guifg=#8BE9FD")  -- 폴더 아이콘 색상
+    vim.cmd("highlight NvimTreeFolderName guifg=#8BE9FD")  -- 폴더 이름 색상
+    vim.cmd("highlight NvimTreeOpenedFolderName guifg=#50FA7B")  -- 열린 폴더 색상
+    vim.cmd("highlight NvimTreeEmptyFolderName guifg=#6272A4")  -- 빈 폴더 색상
+    vim.cmd("highlight NvimTreeRootFolder guifg=#F1FA8C gui=bold")  -- 루트 폴더 (노란색, 굵게)
+    vim.cmd("highlight NvimTreeGitDirty guifg=#FFB86C")  -- Git 변경된 파일
+    vim.cmd("highlight NvimTreeGitNew guifg=#50FA7B")  -- Git 새 파일
+    vim.cmd("highlight NvimTreeGitDeleted guifg=#FF5555")  -- Git 삭제된 파일
+  end,
+  desc = "Apply nvim-tree colors after colorscheme"
+})
 
 -- nvim-tree 초기화
 require("nvim-tree").setup({
@@ -556,6 +663,25 @@ require("nvim-tree").setup({
     enable = true,
     show_on_dirs = true,
     show_on_open_dirs = true,
+  },
+  -- 작업 디렉토리 관련 설정
+  update_cwd = false,  -- nvim-tree가 작업 디렉토리를 변경하지 못하도록 설정
+  respect_buf_cwd = false,  -- 버퍼의 작업 디렉토리를 따르지 않음
+  hijack_directories = {
+    enable = false,  -- 디렉토리 탐색을 가로채지 않음
+    auto_open = false,
+  },
+  filesystem_watchers = {
+    enable = true,
+    debounce_delay = 50,
+    ignore_dirs = {},
+  },
+  actions = {
+    change_dir = {
+      enable = false,  -- 디렉토리 변경 비활성화
+      global = false,
+      restrict_above_cwd = true,  -- 현재 작업 디렉토리 상위로 이동 제한
+    },
   },
   -- 새로운 API를 사용한 자동 열기 설정
   on_attach = function(bufnr)
@@ -592,8 +718,17 @@ require("nvim-tree").setup({
       end
     end, opts('Close'))
     
-    -- 프로젝트 루트로 돌아가기
-    vim.keymap.set('n', 'H', api.tree.change_root_to_parent, opts('Up to parent directory'))
+    -- 프로젝트 루트로 돌아가기 (작업 디렉토리 상위로는 이동 제한)
+    vim.keymap.set('n', 'H', function()
+      local cwd = vim.fn.getcwd()
+      local tree_root = api.tree.get_nodes().absolute_path
+      -- 현재 트리 루트가 작업 디렉토리와 같거나 하위인 경우에만 상위로 이동
+      if tree_root and tree_root ~= cwd and vim.fn.stridx(tree_root, cwd) == 0 then
+        api.tree.change_root_to_parent()
+      else
+        vim.notify("Cannot go above working directory", vim.log.levels.WARN)
+      end
+    end, opts('Up to parent directory'))
     vim.keymap.set('n', '.', api.tree.change_root_to_node, opts('Change root to current node'))
     vim.keymap.set('n', '~', function()
       -- 현재 작업 디렉터리로 변경하고 트리 새로고침
@@ -903,7 +1038,7 @@ require("mason-lspconfig").setup({
     "clangd",        -- C/C++
     "marksman",      -- Markdown
     "jsonls",        -- JSON
-    "dartls",        -- Dart/Flutter
+    -- "dartls"는 Mason으로 설치 불가 (Dart/Flutter SDK에 포함되어 있음)
   },
   automatic_installation = true,
   -- 자동 서버 설정 비활성화 (수동으로 설정)
@@ -1106,10 +1241,12 @@ lspconfig.jsonls.setup({
 })
 
 -- Dart/Flutter 설정
+-- 주의: dartls는 Mason으로 설치할 수 없음 (Dart/Flutter SDK에 포함됨)
+-- Dart SDK가 시스템에 설치되어 있어야 함 (brew install dart 또는 Flutter SDK 설치)
 lspconfig.dartls.setup({
   capabilities = capabilities,
   on_attach = on_attach,
-  cmd = { "dart", "language-server", "--protocol=lsp" },
+  cmd = { "dart", "language-server", "--protocol=lsp" },  -- Dart SDK의 language-server 사용
   filetypes = { "dart" },
   root_dir = lspconfig.util.root_pattern("pubspec.yaml", ".git"),
   init_options = {
