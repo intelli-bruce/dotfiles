@@ -2,10 +2,10 @@
 alias claude-desktop-setting='nvim ~/Library/Application\ Support/Claude/claude_desktop_config.json'
 
 # lazygit
-alias lg='lazygit'
+alias gg='lazygit'
 
 # yazi file manager
 alias yz='yazi'
 
-# bx-cli development
-alias bxdev='cd ~/Projects/bx/bx-cli'
+alias nv='nvim'
+
