@@ -9,3 +9,6 @@ alias yz='yazi'
 
 alias nv='nvim'
 
+alias c='clear'
+
+alias cl='claude'
