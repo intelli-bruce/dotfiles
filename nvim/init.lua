@@ -162,6 +162,128 @@ require("lazy").setup({
   },
   { "kdheepak/lazygit.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
   { "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    dependencies = "nvim-tree/nvim-web-devicons",
+    config = function()
+      require("bufferline").setup({
+        options = {
+          mode = "buffers", -- 버퍼 모드로 설정
+          style_preset = require("bufferline").style_preset.default,
+          themable = true,
+          numbers = "none",
+          close_command = "bdelete! %d",
+          right_mouse_command = "bdelete! %d",
+          left_mouse_command = "buffer %d",
+          middle_mouse_command = nil,
+          indicator = {
+            icon = '▎',
+            style = 'icon',
+          },
+          buffer_close_icon = '󰅖',
+          modified_icon = '●',
+          close_icon = '',
+          left_trunc_marker = '',
+          right_trunc_marker = '',
+          max_name_length = 18,
+          max_prefix_length = 15,
+          truncate_names = true,
+          tab_size = 18,
+          diagnostics = "nvim_lsp",
+          diagnostics_update_in_insert = false,
+          diagnostics_indicator = function(count, level, diagnostics_dict, context)
+            local s = " "
+            for e, n in pairs(diagnostics_dict) do
+              local sym = e == "error" and " " or (e == "warning" and " " or "")
+              s = s .. n .. sym
+            end
+            return s
+          end,
+          offsets = {
+            {
+              filetype = "NvimTree",
+              text = "File Explorer",
+              text_align = "center",
+              separator = true
+            }
+          },
+          color_icons = true,
+          show_buffer_icons = true,
+          show_buffer_close_icons = true,
+          show_close_icon = true,
+          show_tab_indicators = true,
+          show_duplicate_prefix = true,
+          persist_buffer_sort = true,
+          move_wraps_at_ends = false,
+          separator_style = "thin",
+          enforce_regular_tabs = false,
+          always_show_bufferline = true,
+          hover = {
+            enabled = true,
+            delay = 200,
+            reveal = {'close'}
+          },
+          sort_by = 'insert_after_current',
+        },
+        highlights = {
+          fill = {
+            bg = '#1e1e2e',
+          },
+          background = {
+            fg = '#6c7086',
+            bg = '#1e1e2e',
+          },
+          buffer_selected = {
+            fg = '#f5e0dc',
+            bold = true,
+            italic = false,
+          },
+          buffer_visible = {
+            fg = '#9399b2',
+            bg = '#1e1e2e',
+          },
+          close_button = {
+            fg = '#6c7086',
+            bg = '#1e1e2e',
+          },
+          close_button_visible = {
+            fg = '#9399b2',
+            bg = '#1e1e2e',
+          },
+          close_button_selected = {
+            fg = '#f38ba8',
+          },
+          separator = {
+            fg = '#1e1e2e',
+            bg = '#1e1e2e',
+          },
+          separator_visible = {
+            fg = '#1e1e2e',
+            bg = '#1e1e2e',
+          },
+          separator_selected = {
+            fg = '#1e1e2e',
+            bg = '#1e1e2e',
+          },
+          indicator_selected = {
+            fg = '#89b4fa',
+          },
+          modified = {
+            fg = '#f9e2af',
+            bg = '#1e1e2e',
+          },
+          modified_visible = {
+            fg = '#f9e2af',
+            bg = '#1e1e2e',
+          },
+          modified_selected = {
+            fg = '#f9e2af',
+          },
+        },
+      })
+    end,
+  },
   -- { "github/copilot.vim" }, -- 기존 VimScript 버전 (비활성화)
   {
     "zbirenbaum/copilot.lua",  -- 더 빠른 Lua 버전으로 업그레이드
@@ -670,6 +792,15 @@ require("nvim-tree").setup({
     show_on_dirs = true,
     show_on_open_dirs = true,
   },
+  -- 필터 설정
+  filters = {
+    dotfiles = false,  -- 숨김 파일 표시
+    custom = {},  -- 커스텀 필터 (아래에서 동적으로 변경)
+    exclude = {},  -- 제외 패턴
+    git_ignored = false,  -- git ignored 파일도 표시
+    git_clean = false,  -- git clean 파일 숨기기 (false = 모든 파일 표시)
+    no_buffer = false,
+  },
   -- 작업 디렉토리 관련 설정
   update_cwd = false,  -- nvim-tree가 작업 디렉토리를 변경하지 못하도록 설정
   respect_buf_cwd = false,  -- 버퍼의 작업 디렉토리를 따르지 않음
@@ -787,6 +918,61 @@ require("nvim-tree").setup({
         vim.cmd("Gitsigns toggle_current_line_blame")
       end
     end, opts('Git Blame 토글'))
+    
+    -- Git 수정 파일만 필터링 (토글)
+    vim.keymap.set('n', 'gm', function()
+      local tree = require("nvim-tree")
+      local filters = tree.config.filters
+      
+      -- git_clean 필터를 토글 (true = 수정되지 않은 파일 숨김)
+      filters.git_clean = not filters.git_clean
+      
+      if filters.git_clean then
+        vim.notify("Showing only Git modified files", vim.log.levels.INFO)
+      else
+        vim.notify("Showing all files", vim.log.levels.INFO)
+      end
+      
+      -- 트리 새로고침
+      api.tree.reload()
+    end, opts('Toggle Git Modified Files Only'))
+    
+    -- Git 상태별 필터링 옵션
+    vim.keymap.set('n', 'gf', function()
+      vim.ui.select({
+        'All files',
+        'Modified only',
+        'Untracked only',
+        'Ignored files',
+        'Staged files'
+      }, {
+        prompt = 'Select Git filter:',
+      }, function(choice)
+        if not choice then return end
+        
+        local tree = require("nvim-tree")
+        local filters = tree.config.filters
+        
+        if choice == 'All files' then
+          filters.git_clean = false
+          filters.git_ignored = false
+          filters.custom = {}
+        elseif choice == 'Modified only' then
+          filters.git_clean = true
+          filters.git_ignored = true
+        elseif choice == 'Untracked only' then
+          -- 이 기능은 nvim-tree의 기본 기능으로는 직접 지원되지 않으므로
+          -- 커스텀 필터를 사용해야 합니다
+          vim.notify("Filtering untracked files requires custom implementation", vim.log.levels.WARN)
+        elseif choice == 'Ignored files' then
+          filters.git_ignored = not filters.git_ignored
+        elseif choice == 'Staged files' then
+          vim.notify("Filtering staged files requires custom implementation", vim.log.levels.WARN)
+        end
+        
+        api.tree.reload()
+      end)
+    end, opts('Git Filter Menu'))
   end,
   -- Git 상태 표시를 위한 하이라이트 그룹
   renderer = {
@@ -1883,16 +2069,48 @@ vim.keymap.set("n", "<C-Right>", ":vertical resize +3<CR>", { desc = "창 너비
 vim.keymap.set("n", "<C-Up>", ":resize +3<CR>", { desc = "창 높이 늘리기", silent = true })
 vim.keymap.set("n", "<C-Down>", ":resize -3<CR>", { desc = "창 높이 줄이기", silent = true })
 
--- Leader 키를 사용한 대체 단축키 (tmux와 충돌 방지)
+-- 창 분할 단축키
+vim.keymap.set("n", "<leader>|", ":vsplit<CR>", { desc = "수직 분할", silent = true })
+vim.keymap.set("n", "<leader>-", ":split<CR>", { desc = "수평 분할", silent = true })
+vim.keymap.set("n", "<leader>wx", ":close<CR>", { desc = "현재 창 닫기", silent = true })
+vim.keymap.set("n", "<leader>wo", ":only<CR>", { desc = "현재 창만 남기기", silent = true })
+
+-- 창 이동 (vim 스타일)
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "왼쪽 창으로 이동", silent = true })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "아래 창으로 이동", silent = true })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "위 창으로 이동", silent = true })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "오른쪽 창으로 이동", silent = true })
+
+-- Leader 키를 사용한 창 크기 조절 (tmux와 충돌 방지)
 vim.keymap.set("n", "<leader>wh", ":vertical resize -5<CR>", { desc = "창 너비 줄이기", silent = true })
 vim.keymap.set("n", "<leader>wl", ":vertical resize +5<CR>", { desc = "창 너비 늘리기", silent = true })
 vim.keymap.set("n", "<leader>wk", ":resize +5<CR>", { desc = "창 높이 늘리기", silent = true })
 vim.keymap.set("n", "<leader>wj", ":resize -5<CR>", { desc = "창 높이 줄이기", silent = true })
 vim.keymap.set("n", "<leader>w=", "<C-w>=", { desc = "모든 창 크기 동일하게", silent = true })
 
--- 버퍼 관리 단축키
-vim.keymap.set("n", "<S-h>", ":bprevious<CR>", { desc = "이전 버퍼" })
-vim.keymap.set("n", "<S-l>", ":bnext<CR>", { desc = "다음 버퍼" })
+-- 창 배치 변경
+vim.keymap.set("n", "<leader>wr", "<C-w>r", { desc = "창 위치 순환", silent = true })
+vim.keymap.set("n", "<leader>wH", "<C-w>H", { desc = "현재 창을 왼쪽으로 이동", silent = true })
+vim.keymap.set("n", "<leader>wJ", "<C-w>J", { desc = "현재 창을 아래로 이동", silent = true })
+vim.keymap.set("n", "<leader>wK", "<C-w>K", { desc = "현재 창을 위로 이동", silent = true })
+vim.keymap.set("n", "<leader>wL", "<C-w>L", { desc = "현재 창을 오른쪽으로 이동", silent = true })
+
+-- 버퍼 관리 단축키 (BufferLine 플러그인과 연동)
+vim.keymap.set("n", "<S-h>", ":BufferLineCyclePrev<CR>", { desc = "이전 버퍼" })
+vim.keymap.set("n", "<S-l>", ":BufferLineCycleNext<CR>", { desc = "다음 버퍼" })
+vim.keymap.set("n", "<leader>bp", ":BufferLinePickClose<CR>", { desc = "버퍼 선택하여 닫기" })
+vim.keymap.set("n", "<leader>bo", ":BufferLineCloseOthers<CR>", { desc = "다른 버퍼 모두 닫기" })
+vim.keymap.set("n", "<leader>bc", ":BufferLineCloseRight<CR>", { desc = "오른쪽 버퍼 모두 닫기" })
+vim.keymap.set("n", "<leader>bl", ":BufferLineCloseLeft<CR>", { desc = "왼쪽 버퍼 모두 닫기" })
+vim.keymap.set("n", "<leader>1", ":BufferLineGoToBuffer 1<CR>", { desc = "첫 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>2", ":BufferLineGoToBuffer 2<CR>", { desc = "두 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>3", ":BufferLineGoToBuffer 3<CR>", { desc = "세 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>4", ":BufferLineGoToBuffer 4<CR>", { desc = "네 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>5", ":BufferLineGoToBuffer 5<CR>", { desc = "다섯 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>6", ":BufferLineGoToBuffer 6<CR>", { desc = "여섯 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>7", ":BufferLineGoToBuffer 7<CR>", { desc = "일곱 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>8", ":BufferLineGoToBuffer 8<CR>", { desc = "여덟 번째 버퍼로 이동" })
+vim.keymap.set("n", "<leader>9", ":BufferLineGoToBuffer 9<CR>", { desc = "아홉 번째 버퍼로 이동" })
 
 -- LuaSnip 설정
 require("luasnip.loaders.from_vscode").lazy_load()
