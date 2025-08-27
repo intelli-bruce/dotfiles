@@ -43,4 +43,5 @@ cask "postman"              # API 테스트 도구
 cask "figma"                # 디자인 도구
 
 # 폰트
-cask "font-jetbrains-mono-nerd-font"  # 개발용 폰트
+cask "font-jetbrains-mono-nerd-font"  # 개발용 폰트 (영문)
+cask "font-d2coding"                   # D2Coding 한글 폰트

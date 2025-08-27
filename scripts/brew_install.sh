@@ -32,6 +32,22 @@ echo "📦 Brewfile에서 패키지 설치 중..."
 DOTFILES_DIR="$HOME/dotfiles"
 brew bundle --file="$DOTFILES_DIR/Brewfile"
 
+# 폰트 설치 확인
+echo "🔤 폰트 설치 확인 중..."
+if ! ls ~/Library/Fonts/*D2Coding* &> /dev/null; then
+  echo "   D2Coding 폰트가 설치되었습니다."
+else
+  echo "   ⚠️  D2Coding 폰트를 수동으로 설치해야 할 수 있습니다."
+  echo "   brew install --cask font-d2coding"
+fi
+
+if ! ls ~/Library/Fonts/*JetBrains* &> /dev/null; then
+  echo "   JetBrainsMono Nerd Font가 설치되었습니다."
+else
+  echo "   ⚠️  JetBrainsMono Nerd Font를 수동으로 설치해야 할 수 있습니다."
+  echo "   brew install --cask font-jetbrains-mono-nerd-font"
+fi
+
 echo "🧹 Homebrew 정리 중..."
 brew cleanup
 
