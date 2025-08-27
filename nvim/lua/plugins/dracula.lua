@@ -96,13 +96,14 @@ return {
             
             -- 줄 번호와 거터 (배경 투명)
             LineNr = { fg = "#A3A5BA", bg = "NONE" },
-            CursorLineNr = { fg = "#FF79C6", bg = "NONE", bold = true },
+            CursorLineNr = { fg = "#FF79C6", bg = "#44475A", bold = true },  -- 활성 라인 배경 적용
             SignColumn = { bg = "NONE" },
             FoldColumn = { fg = "#6272A4", bg = "NONE" },
             
-            -- 캐럿 라인
-            CursorLine = { bg = "#44475A" },
+            -- 캐럿 라인 (IntelliJ CARET_ROW_COLOR)
+            CursorLine = { bg = "#44475A" },  -- IntelliJ와 동일
             CursorColumn = { bg = "#44475A" },
+            ColorColumn = { bg = "#44475A" },
             
             -- 선택 영역 (IntelliJ 색상)
             Visual = { bg = "#666B87" },
@@ -112,9 +113,11 @@ return {
             Search = { fg = "#282A36", bg = "#50FA7B" },
             IncSearch = { fg = "#282A36", bg = "#FFB86C" },
             
-            -- 들여쓰기 가이드 (거의 안 보이게)
-            IndentBlanklineChar = { fg = "#262830" },  -- 극도로 연한 회색 (배경과 거의 비슷)
-            IndentBlanklineContextChar = { fg = "#303340" },  -- 활성 컨텍스트도 매우 연하게
+            -- 들여쓰기 가이드 (매우 연한 색상)
+            IblIndent = { fg = "#2A2C37" },  -- indent-blankline v3 - 거의 안 보이게
+            IblScope = { fg = "#3A3C47" },  -- indent-blankline v3 active scope - 약간만 밝게
+            IblWhitespace = { fg = "#2A2C37" },
+            MiniIndentscopeSymbol = { fg = "#3A3C47" },  -- mini.indentscope - 현재 스코프
             
             -- 경계선
             VertSplit = { fg = "#6B7090", bg = "NONE" },
