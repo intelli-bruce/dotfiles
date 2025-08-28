@@ -5,12 +5,15 @@ keybind = super+shift+r=reload_config
 
 # Theme
 theme = Dracula
-background = 23252B
+background = 23252A
 
 # Font Settings
 font-family = JetBrainsMono Nerd Font Mono
 font-family = D2Coding
-font-size = 16.5
+font-size = 16
+
+# Cell height adjustment (increases line spacing)
+adjust-cell-height = 12.5%
 
 # Window padding
 window-padding-x = 10
