@@ -5,6 +5,7 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "d12frosted/emacs"
+tap "laishulu/homebrew"
 
 # CLI 도구
 brew "git"       # 버전 관리 시스템
@@ -24,6 +25,7 @@ brew "tree-sitter" # 코드 파싱 라이브러리
 brew "postgresql@15" # PostgreSQL 데이터베이스
 brew "node"      # Node.js
 brew "python@3.13" # Python 3.13
+brew "macism"    # 입력기 전환 도구 (Neovim im-select용)
 
 # 추가 CLI 도구 (선택사항)
 brew "uv"          # Python 패키지 관리자
