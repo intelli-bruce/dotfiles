@@ -26,10 +26,6 @@ background-blur = 0
 # Focus/unfocus panel brightness
 unfocused-split-opacity = 0.7
 
-# Performance Settings - 240Hz
-window-vsync = false
-custom-shader-animation = always
-
 # Basic shell settings
 shell-integration = detect
 window-save-state = always
