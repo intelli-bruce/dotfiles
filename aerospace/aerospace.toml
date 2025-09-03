@@ -69,13 +69,9 @@ alt-k = 'focus up --boundaries all-monitors-outer-frame'
 alt-shift-h = 'move left'
 alt-shift-l = 'move right'
 
-# 창을 다른 모니터로 이동
-alt-shift-j = 'move-node-to-monitor down'
-alt-shift-k = 'move-node-to-monitor up'
-
-# 같은 모니터 내 창 위치 이동 (대체 키)
-alt-cmd-j = 'move down'
-alt-cmd-k = 'move up'
+# 상하 이동: 모니터 내 창 이동 → 다른 모니터로 자동 전환
+alt-shift-j = 'move down --boundaries all-monitors-outer-frame'
+alt-shift-k = 'move up --boundaries all-monitors-outer-frame'
 
 # 워크스페이스로 창 이동 (alt-shift + 숫자)
 alt-shift-1 = 'move-node-to-workspace 1'
