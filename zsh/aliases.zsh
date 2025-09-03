@@ -12,3 +12,5 @@ alias nv='nvim'
 alias c='clear'
 
 alias cl='claude'
+
+alias brx='brxce'
