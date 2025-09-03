@@ -1,0 +1,186 @@
+# AeroSpace - i3 스타일 타일링 윈도우 매니저 설정
+# 문서: https://nikitabobko.github.io/AeroSpace/guide
+
+# 시작 설정
+start-at-login = true
+after-startup-command = []
+
+# 정규화 설정
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# 레이아웃 설정
+accordion-padding = 30
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# 자동 백슬래시 앱 숨기기 비활성화
+automatically-unhide-macos-hidden-apps = false
+
+# 마우스가 포커스된 모니터 중앙으로 이동
+# on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+# 키보드 레이아웃
+[key-mapping]
+preset = 'qwerty'
+
+# 갭 설정 (창 사이 간격)
+[gaps]
+inner.horizontal = 8
+inner.vertical = 8
+outer.top = 8
+outer.bottom = 8
+outer.left = 8
+outer.right = 8
+
+# 메인 모드 키 바인딩
+[mode.main.binding]
+
+# 워크스페이스 전환 (alt + 숫자)
+alt-1 = 'workspace 1'
+alt-2 = 'workspace 2'
+alt-3 = 'workspace 3'
+alt-4 = 'workspace 4'
+alt-5 = 'workspace 5'
+alt-6 = 'workspace 6'
+alt-7 = 'workspace 7'
+alt-8 = 'workspace 8'
+alt-9 = 'workspace 9'
+alt-0 = 'workspace 10'
+
+# 워크스페이스 전환 - Cmd 버전 (선택사항)
+# macOS Mission Control과 충돌할 수 있으므로 주의
+# cmd-1 = 'workspace 1'
+# cmd-2 = 'workspace 2'
+# cmd-3 = 'workspace 3'
+# cmd-4 = 'workspace 4'
+# cmd-5 = 'workspace 5'
+
+# 창 포커스 이동 (alt + hjkl)
+# 듀얼 모니터 설정: j/k는 모니터 간 이동, h/l은 창 간 이동
+alt-h = 'focus left'
+alt-l = 'focus right'
+
+# 모니터 간 포커스 이동 (상하 배치 듀얼 모니터)
+alt-j = 'focus-monitor down'
+alt-k = 'focus-monitor up'
+
+# 같은 모니터 내 창 이동 (대체 키)
+alt-ctrl-j = 'focus down'
+alt-ctrl-k = 'focus up'
+
+# 창 이동 (alt-shift + hjkl)
+alt-shift-h = 'move left'
+alt-shift-l = 'move right'
+
+# 창을 다른 모니터로 이동
+alt-shift-j = 'move-node-to-monitor down'
+alt-shift-k = 'move-node-to-monitor up'
+
+# 같은 모니터 내 창 위치 이동 (대체 키)
+alt-cmd-j = 'move down'
+alt-cmd-k = 'move up'
+
+# 워크스페이스로 창 이동 (alt-shift + 숫자)
+alt-shift-1 = 'move-node-to-workspace 1'
+alt-shift-2 = 'move-node-to-workspace 2'
+alt-shift-3 = 'move-node-to-workspace 3'
+alt-shift-4 = 'move-node-to-workspace 4'
+alt-shift-5 = 'move-node-to-workspace 5'
+alt-shift-6 = 'move-node-to-workspace 6'
+alt-shift-7 = 'move-node-to-workspace 7'
+alt-shift-8 = 'move-node-to-workspace 8'
+alt-shift-9 = 'move-node-to-workspace 9'
+alt-shift-0 = 'move-node-to-workspace 10'
+
+# 레이아웃 변경 (Spotlight와 충돌 회피)
+alt-shift-space = 'layout tiles horizontal vertical'
+alt-tab = 'layout floating tiling'                   # Alt+Space 대신 Alt+Tab 사용
+# 또는
+# alt-t = 'layout floating tiling'  # Alt+T for Tiling
+
+# 창 크기 조절 (alt-shift-ctrl + hjkl)
+alt-shift-ctrl-h = 'resize width -50'
+alt-shift-ctrl-j = 'resize height +50'
+alt-shift-ctrl-k = 'resize height -50'
+alt-shift-ctrl-l = 'resize width +50'
+
+# 창 크기 균등 분배
+alt-shift-equal = 'balance-sizes'
+
+# 창 분할 방향 (join-with 사용)
+alt-shift-minus = 'join-with down'
+alt-shift-backslash = 'join-with right'
+
+# 전체화면 토글
+alt-f = 'fullscreen'
+
+# 플로팅 토글
+alt-shift-f = 'layout floating tiling'
+
+# 서비스 모드 진입
+alt-shift-semicolon = 'mode service'
+
+# 창 닫기
+alt-shift-q = 'close'
+
+# 모든 창 닫기
+alt-shift-ctrl-q = 'close-all-windows-but-current'
+
+# 서비스 모드 키 바인딩
+[mode.service.binding]
+# 설정 리로드
+r = ['reload-config', 'mode main']
+
+# 워크스페이스 트리 평탄화
+f = ['flatten-workspace-tree', 'mode main']
+
+# 서비스 모드 나가기
+esc = 'mode main'
+q = 'mode main'
+
+# 모든 창 마코스 네이티브 전체화면으로
+m = ['mode main', 'macos-native-fullscreen']
+
+# 레이아웃 정보 보기
+l = ['layout tiles accordion', 'mode main']
+
+# AeroSpace 종료/재시작
+# x = ['exec-and-forget killall AeroSpace', 'mode main']
+# s = ['exec-and-forget open -a AeroSpace', 'mode main']
+
+# 워크스페이스별 앱 설정
+[[on-window-detected]]
+if.app-id = 'com.microsoft.VSCode'
+run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+if.app-id = 'com.figma.Desktop'
+run = 'move-node-to-workspace 5'
+
+# 워크스페이스를 특정 모니터에 고정 (선택사항)
+[workspace-to-monitor-force-assignment]
+# 상단 모니터에 워크스페이스 1-6
+1 = 1
+2 = 1
+3 = 1
+4 = 1
+5 = 1
+6 = 1
+# 하단 모니터에 워크스페이스 7-10
+7 = 2
+8 = 2
+9 = 2
+10 = 2

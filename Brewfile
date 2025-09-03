@@ -33,6 +33,7 @@ brew "uv"          # Python 패키지 관리자
 # 개발 툴
 cask "karabiner-elements"   # 키보드 커스터마이저
 cask "rectangle"            # 창 관리 도구
+cask "nikitabobko/tap/aerospace"  # 타일링 윈도우 매니저
 cask "docker"               # 컨테이너 플랫폼
 cask "jetbrains-toolbox"    # JetBrains IDE 관리 도구
 cask "google-chrome"        # 웹 브라우저

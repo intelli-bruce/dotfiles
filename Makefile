@@ -82,6 +82,12 @@ ghostty: ## Ghostty 설정만 연결
 	@ln -sf $(DOTFILES_DIR)/ghostty/config $$HOME/.config/ghostty/config
 	@echo "$(GREEN)✓ Ghostty 설정 완료$(RESET)"
 
+aerospace: ## AeroSpace 설정만 연결
+	@echo "$(BLUE)▶ AeroSpace 설정 연결 중...$(RESET)"
+	@mkdir -p $$HOME/.config/aerospace
+	@ln -sf $(DOTFILES_DIR)/aerospace/aerospace.toml $$HOME/.config/aerospace/aerospace.toml
+	@echo "$(GREEN)✓ AeroSpace 설정 완료$(RESET)"
+
 ## 유틸리티
 backup: ## 현재 설정 백업
 	@echo "$(BLUE)▶ 설정 백업 중...$(RESET)"
@@ -100,6 +106,8 @@ check: ## 설정 파일 링크 상태 확인
 	@ls -la ~/.config/nvim/init.lua 2>/dev/null || echo "  Not linked"
 	@echo "\nKarabiner:"
 	@ls -la ~/.config/karabiner/karabiner.json 2>/dev/null || echo "  Not linked"
+	@echo "\nAeroSpace:"
+	@ls -la ~/.config/aerospace/aerospace.toml 2>/dev/null || echo "  Not linked"
 
 clean: ## 모든 심볼릭 링크 제거 (주의!)
 	@echo "$(YELLOW)⚠ 모든 dotfiles 링크를 제거합니다.$(RESET)"
