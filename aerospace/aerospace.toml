@@ -57,17 +57,13 @@ alt-0 = 'workspace 10'
 # cmd-5 = 'workspace 5'
 
 # 창 포커스 이동 (alt + hjkl)
-# 듀얼 모니터 설정: j/k는 모니터 간 이동, h/l은 창 간 이동
+# boundaries 옵션으로 모니터 내 창 이동과 모니터 간 이동 통합
 alt-h = 'focus left'
 alt-l = 'focus right'
 
-# 모니터 간 포커스 이동 (상하 배치 듀얼 모니터)
-alt-j = 'focus-monitor down'
-alt-k = 'focus-monitor up'
-
-# 같은 모니터 내 창 이동 (대체 키)
-alt-ctrl-j = 'focus down'
-alt-ctrl-k = 'focus up'
+# 상하 이동: 모니터 내 창 → 다른 모니터로 자동 전환
+alt-j = 'focus down --boundaries all-monitors-outer-frame'
+alt-k = 'focus up --boundaries all-monitors-outer-frame'
 
 # 창 이동 (alt-shift + hjkl)
 alt-shift-h = 'move left'
@@ -107,8 +103,10 @@ alt-r = 'mode resize'
 alt-shift-equal = 'balance-sizes'
 
 # 창 분할 방향 (join-with 사용)
-alt-shift-minus = 'join-with down'
-alt-shift-backslash = 'join-with right'
+# join-with right: 오른쪽 창과 함께 수평 컨테이너로 그룹화 (좌우 분할)
+# join-with down: 아래쪽 창과 함께 수직 컨테이너로 그룹화 (위아래 분할)
+alt-minus = 'join-with right'         # - 키로 좌우 분할 (수평선처럼)
+alt-backslash = 'join-with down'      # \ 키로 위아래 분할 (수직선처럼)
 
 # 전체화면 토글
 alt-f = 'fullscreen'
