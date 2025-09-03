@@ -99,11 +99,9 @@ alt-tab = 'layout floating tiling'                   # Alt+Space 대신 Alt+Tab 
 # 또는
 # alt-t = 'layout floating tiling'  # Alt+T for Tiling
 
-# 창 크기 조절 (alt-shift-ctrl + hjkl)
-alt-shift-ctrl-h = 'resize width -50'
-alt-shift-ctrl-j = 'resize height +50'
-alt-shift-ctrl-k = 'resize height -50'
-alt-shift-ctrl-l = 'resize width +50'
+# 창 크기 조절 (r 모드 사용 - vim 스타일)
+# Alt + r로 resize 모드 진입, 그 다음 hjkl 사용
+alt-r = 'mode resize'
 
 # 창 크기 균등 분배
 alt-shift-equal = 'balance-sizes'
@@ -184,3 +182,25 @@ run = 'move-node-to-workspace 5'
 8 = 2
 9 = 2
 10 = 2
+
+# Resize 모드 키 바인딩 (Alt + r로 진입)
+[mode.resize.binding]
+# hjkl로 크기 조절
+h = 'resize width -50'
+l = 'resize width +50'
+j = 'resize height +50'
+k = 'resize height -50'
+
+# Shift + hjkl로 더 크게 조절
+shift-h = 'resize width -100'
+shift-l = 'resize width +100'
+shift-j = 'resize height +100'
+shift-k = 'resize height -100'
+
+# 균등 분배
+equal = 'balance-sizes'
+
+# resize 모드 나가기
+esc = 'mode main'
+enter = 'mode main'
+r = 'mode main'
