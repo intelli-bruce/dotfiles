@@ -277,7 +277,6 @@ config.key_tables = {
     
     -- 종료
     { key = 'q', mods = 'NONE', action = act.CopyMode 'Close' },
-    { key = 'Escape', mods = 'NONE', action = act.CopyMode 'Close' },
     { key = 'c', mods = 'CTRL', action = act.CopyMode 'Close' },
     
     -- 다음 줄로
