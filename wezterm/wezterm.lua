@@ -275,6 +275,9 @@ config.key_tables = {
       }
     },
     
+    -- 선택 해제 (vim의 Escape 동작)
+    { key = 'Escape', mods = 'NONE', action = act.CopyMode 'ClearSelectionMode' },
+    
     -- 종료
     { key = 'q', mods = 'NONE', action = act.CopyMode 'Close' },
     { key = 'c', mods = 'CTRL', action = act.CopyMode 'Close' },
