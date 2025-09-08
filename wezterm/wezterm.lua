@@ -171,6 +171,24 @@ config.keys = {
   { key = '+', mods = 'CMD', action = act.IncreaseFontSize },
   { key = '-', mods = 'CMD', action = act.DecreaseFontSize },
   { key = '0', mods = 'CMD', action = act.ResetFontSize },
+  
+  -- Ctrl+U/D로 Copy Mode 진입 + 스크롤
+  { 
+    key = 'u', 
+    mods = 'CTRL', 
+    action = act.Multiple {
+      act.ActivateCopyMode,
+      act.CopyMode { MoveByPage = -0.5 }
+    }
+  },
+  { 
+    key = 'd', 
+    mods = 'CTRL', 
+    action = act.Multiple {
+      act.ActivateCopyMode,
+      act.CopyMode { MoveByPage = 0.5 }
+    }
+  },
 }
 
 -- 마우스 바인딩
@@ -227,7 +245,8 @@ config.key_tables = {
     -- 선택 모드
     { key = 'v', mods = 'NONE', action = act.CopyMode { SetSelectionMode = 'Cell' } },
     { key = 'V', mods = 'NONE', action = act.CopyMode { SetSelectionMode = 'Line' } },
-    { key = 'v', mods = 'CTRL', action = act.CopyMode { SetSelectionMode = 'Block' } },
+    { key = 'r', mods = 'NONE', action = act.CopyMode { SetSelectionMode = 'Block' } },  -- 블록 선택 (더 편한 키)
+    { key = 'v', mods = 'CTRL', action = act.CopyMode { SetSelectionMode = 'Block' } },  -- vim 호환성 유지
     { key = 'Space', mods = 'NONE', action = act.CopyMode { SetSelectionMode = 'Cell' } },
     
     -- 선택 영역 조정
