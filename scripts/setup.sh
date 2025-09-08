@@ -83,32 +83,38 @@ mkdir -p "$HOME/.config/ghostty"
 ln -sf "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
 success "Ghostty 설정 연결 완료"
 
-# 5. Yazi 설정
+# 5. WezTerm 설정
+step "WezTerm 설정 연결 중..."
+mkdir -p "$HOME/.config/wezterm"
+ln -sf "$DOTFILES_DIR/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua"
+success "WezTerm 설정 연결 완료"
+
+# 6. Yazi 설정
 step "Yazi 설정 연결 중..."
 mkdir -p "$HOME/.config/yazi"
 ln -sf "$DOTFILES_DIR/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
 ln -sf "$DOTFILES_DIR/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
 success "Yazi 설정 연결 완료"
 
-# 6. Aerospace 설정
+# 7. Aerospace 설정
 step "Aerospace 설정 연결 중..."
 mkdir -p "$HOME/.config/aerospace"
 ln -sf "$DOTFILES_DIR/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
 success "Aerospace 설정 연결 완료"
 
-# 7. Lazygit 설정
+# 8. Lazygit 설정
 step "Lazygit 설정 연결 중..."
 mkdir -p "$HOME/Library/Application Support/lazygit"
 ln -sf "$DOTFILES_DIR/lazygit/config.yml" "$HOME/Library/Application Support/lazygit/config.yml"
 success "Lazygit 설정 연결 완료"
 
-# 8. Hammerspoon 설정
+# 9. Hammerspoon 설정
 step "Hammerspoon 설정 연결 중..."
 mkdir -p "$HOME/.hammerspoon"
 ln -sf "$DOTFILES_DIR/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
 success "Hammerspoon 설정 연결 완료"
 
-# 9. Claude 설정
+# 10. Claude 설정
 step "Claude 설정 연결 중..."
 mkdir -p "$HOME/.claude"
 ln -sf "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
@@ -117,7 +123,7 @@ ln -sf "$DOTFILES_DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-co
 chmod +x "$DOTFILES_DIR/claude/statusline-command.sh"
 success "Claude 설정 연결 완료"
 
-# 10. Zsh 설정
+# 11. Zsh 설정
 step "Zsh 설정 연결 중..."
 ln -sf "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
 ln -sf "$DOTFILES_DIR/zsh/zprofile" "$HOME/.zprofile"
@@ -126,7 +132,7 @@ if [ -f "$DOTFILES_DIR/zsh/p10k.zsh" ]; then
 fi
 success "Zsh 설정 연결 완료"
 
-# 11. 스크립트 실행 권한 설정
+# 12. 스크립트 실행 권한 설정
 step "스크립트 실행 권한 설정 중..."
 find "$SCRIPTS_DIR" -type f -name "*.sh" -exec chmod +x {} \;
 chmod +x "$DOTFILES_DIR/install.sh" 2>/dev/null || true

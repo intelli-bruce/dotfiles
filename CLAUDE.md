@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `install.sh`: 심볼릭 링크를 생성하여 설정 파일을 적절한 위치에 설치하는 스크립트
 - `ghostty/config`: Ghostty 터미널 에뮬레이터 설정
+- `wezterm/wezterm.lua`: WezTerm 터미널 에뮬레이터 설정
 - `nvim/init.lua`: Neovim 텍스트 에디터 설정
 - `karabiner/karabiner.json`: Karabiner-Elements 키 매핑 설정
 - `rectangle/RectangleConfig.json`: Rectangle 창 관리자 설정
@@ -47,6 +48,18 @@ dotfiles를 설치하려면 다음 명령어를 실행하세요:
   - `Cmd+Shift+h/j/k/l`: vim 스타일 패널 이동
   - `Cmd+Shift+\`: 오른쪽 분할, `Cmd+Shift+-`: 아래 분할
   - `Cmd+Ctrl+h/j/k/l`: 패널 크기 조정
+
+### WezTerm (`wezterm/wezterm.lua`)
+- Lua 기반 설정 파일로 GPU 가속 지원
+- JetBrainsMono Nerd Font와 한글 폰트 지원 (Pretendard 추가)
+- Dracula 색상 테마
+- 배경 투명도 0.95 및 블러 효과 20
+- 패널 분할 및 네비게이션 단축키 (Ghostty와 동일):
+  - `Cmd+Shift+\`: 수평 분할, `Cmd+Shift+-`: 수직 분할
+  - `Cmd+Shift+h/j/k/l`: vim 스타일 패널 이동
+  - `Cmd+Ctrl+h/j/k/l`: 패널 크기 조정
+- 탭 관리: `Cmd+t` 새 탭, `Cmd+숫자` 탭 전환
+- 폰트 크기 조정: `Cmd++/-/0`
 
 ### Neovim (`nvim/init.lua`)
 - lazy.nvim 플러그인 매니저 사용

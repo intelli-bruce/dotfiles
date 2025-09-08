@@ -82,6 +82,12 @@ ghostty: ## Ghostty 설정만 연결
 	@ln -sf $(DOTFILES_DIR)/ghostty/config $$HOME/.config/ghostty/config
 	@echo "$(GREEN)✓ Ghostty 설정 완료$(RESET)"
 
+wezterm: ## WezTerm 설정만 연결
+	@echo "$(BLUE)▶ WezTerm 설정 연결 중...$(RESET)"
+	@mkdir -p $$HOME/.config/wezterm
+	@ln -sf $(DOTFILES_DIR)/wezterm/wezterm.lua $$HOME/.config/wezterm/wezterm.lua
+	@echo "$(GREEN)✓ WezTerm 설정 완료$(RESET)"
+
 aerospace: ## AeroSpace 설정만 연결
 	@echo "$(BLUE)▶ AeroSpace 설정 연결 중...$(RESET)"
 	@mkdir -p $$HOME/.config/aerospace
@@ -102,6 +108,8 @@ check: ## 설정 파일 링크 상태 확인
 	@echo "$(BLUE)▶ 설정 파일 상태 확인$(RESET)"
 	@echo "\nGhostty:"
 	@ls -la ~/.config/ghostty/config 2>/dev/null || echo "  Not linked"
+	@echo "\nWezTerm:"
+	@ls -la ~/.config/wezterm/wezterm.lua 2>/dev/null || echo "  Not linked"
 	@echo "\nNeovim:"
 	@ls -la ~/.config/nvim/init.lua 2>/dev/null || echo "  Not linked"
 	@echo "\nKarabiner:"
