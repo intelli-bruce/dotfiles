@@ -164,31 +164,13 @@ config.keys = {
   -- 검색
   { key = 'f', mods = 'CMD', action = act.Search 'CurrentSelectionOrEmptyString' },
   
-  -- 전체화면
-  { key = 'Enter', mods = 'CMD|SHIFT', action = act.ToggleFullScreen },
+  -- 전체화면 단축키 비활성화
+  { key = 'Enter', mods = 'ALT', action = act.Nop },  -- Alt+Enter 명시적 비활성화
   
   -- 폰트 크기 조정
   { key = '+', mods = 'CMD', action = act.IncreaseFontSize },
   { key = '-', mods = 'CMD', action = act.DecreaseFontSize },
   { key = '0', mods = 'CMD', action = act.ResetFontSize },
-  
-  -- Ctrl+U/D로 Copy Mode 진입 + 스크롤
-  { 
-    key = 'u', 
-    mods = 'CTRL', 
-    action = act.Multiple {
-      act.ActivateCopyMode,
-      act.CopyMode { MoveByPage = -0.5 }
-    }
-  },
-  { 
-    key = 'd', 
-    mods = 'CTRL', 
-    action = act.Multiple {
-      act.ActivateCopyMode,
-      act.CopyMode { MoveByPage = 0.5 }
-    }
-  },
 }
 
 -- 마우스 바인딩
