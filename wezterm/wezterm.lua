@@ -21,6 +21,7 @@ config.font = wezterm.font_with_fallback {
 }
 config.font_size = 16.0
 config.line_height = 1.125
+config.cell_width = 0.9  -- 자간을 10% 줄임 (기본값: 1.0)
 
 -- 색상 테마
 config.color_scheme = 'Dracula'
