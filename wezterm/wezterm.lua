@@ -118,6 +118,9 @@ config.keys = {
   -- 설정 다시 로드
   { key = 'r', mods = 'CMD|SHIFT', action = act.ReloadConfiguration },
   
+  -- Shift+Enter로 \x1b\r 전송
+  { key = 'Enter', mods = 'SHIFT', action = wezterm.action { SendString = '\x1b\r' } },
+  
   -- Copy Mode 활성화
   { key = 'o', mods = 'CMD|SHIFT', action = act.ActivateCopyMode },
   
