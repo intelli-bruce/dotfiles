@@ -192,6 +192,23 @@ return {
             -- TODO 주석
             Todo = { fg = "#E998FF", bold = true },
             
+            -- LSP 참조 하이라이팅 (IntelliJ Bruce Style의 IDENTIFIER_UNDER_CARET)
+            -- 커서가 올라간 변수/파라미터와 같은 이름의 모든 참조를 강조
+            LspReferenceText = { bg = "#5A5F7A", bold = true },  -- 일반 텍스트 참조 - 더 밝게 + 볼드
+            LspReferenceRead = { bg = "#5A5F7A", bold = true },  -- 읽기 참조 - 더 밝게 + 볼드
+            LspReferenceWrite = { bg = "#6A6F8A", bold = true, underline = true },  -- 쓰기 참조 - 더 밝게 + 볼드 + 언더라인
+            
+            -- vim-illuminate 플러그인 사용 시 (더 나은 성능)
+            IlluminatedWordText = { bg = "#5A5F7A", bold = true },
+            IlluminatedWordRead = { bg = "#5A5F7A", bold = true },
+            IlluminatedWordWrite = { bg = "#6A6F8A", bold = true, underline = true },
+            
+            -- Semantic Token 하이라이팅
+            ["@lsp.type.variable"] = { link = "@variable" },
+            ["@lsp.type.parameter"] = { link = "@variable.parameter" },
+            ["@lsp.typemod.variable.definition"] = { bg = "#53576D" },
+            ["@lsp.typemod.parameter.definition"] = { bg = "#53576D" },
+            
             -- Telescope 색상 설정
             TelescopeNormal = { fg = "#F8F8F2", bg = "#282A36" },
             TelescopeBorder = { fg = "#6272A4", bg = "#282A36" },
