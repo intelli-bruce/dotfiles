@@ -13,4 +13,8 @@ alias c='clear'
 
 alias cl='claude'
 
-alias brx='brxce'
+alias b='brxce'
+
+alias ba='brxce add'
+
+alias bt='brxce wn tree'
