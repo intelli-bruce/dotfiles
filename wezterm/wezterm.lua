@@ -113,6 +113,66 @@ config.quick_select_patterns = {
 }
 config.quick_select_alphabet = 'asdfghjklqwertyuiop'
 
+-- 반응형 레이아웃을 위한 동적 패딩 계산 함수
+local function compute_responsive_padding(window)
+  local window_dims = window:get_dimensions()
+  local overrides = window:get_config_overrides() or {}
+
+  -- 창 너비가 일정 크기 이상일 때 중앙 정렬
+  local width_threshold = 1800  -- 픽셀 단위 임계값
+  local max_content_width = 1400  -- 최대 컨텐츠 너비
+
+  if window_dims.pixel_width > width_threshold then
+    -- 중앙 정렬을 위한 패딩 계산
+    local horizontal_padding = math.max(0, math.floor((window_dims.pixel_width - max_content_width) / 2))
+
+    -- 상하 패딩도 조금 추가하여 균형잡힌 레이아웃
+    local vertical_padding = '1.5cell'
+
+    local new_padding = {
+      left = horizontal_padding,
+      right = horizontal_padding,
+      top = vertical_padding,
+      bottom = '0px',
+    }
+
+    -- 변경사항이 없으면 불필요한 업데이트 방지
+    if overrides.window_padding and
+       overrides.window_padding.left == new_padding.left and
+       overrides.window_padding.right == new_padding.right then
+      return
+    end
+
+    overrides.window_padding = new_padding
+  else
+    -- 작은 창에서는 기본 패딩 사용
+    if overrides.window_padding then
+      overrides.window_padding = nil  -- 기본값으로 복원
+    end
+  end
+
+  window:set_config_overrides(overrides)
+end
+
+-- 창 크기 변경 시 패딩 재계산
+wezterm.on('window-resized', function(window, pane)
+  compute_responsive_padding(window)
+end)
+
+-- 설정 리로드 시에도 패딩 재계산
+wezterm.on('window-config-reloaded', function(window)
+  compute_responsive_padding(window)
+end)
+
+-- 초기 GUI 시작 시 패딩 적용
+wezterm.on('gui-startup', function(cmd)
+  local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+  -- 약간의 지연 후 패딩 계산 (창이 완전히 로드된 후)
+  wezterm.time.call_after(0.1, function()
+    compute_responsive_padding(window)
+  end)
+end)
+
 -- 키 바인딩
 config.keys = {
   -- 설정 다시 로드
