@@ -118,15 +118,38 @@ local function compute_responsive_padding(window)
   local window_dims = window:get_dimensions()
   local overrides = window:get_config_overrides() or {}
 
-  -- 창 너비가 일정 크기 이상일 때 중앙 정렬
-  local width_threshold = 1800  -- 픽셀 단위 임계값
-  local max_content_width = 1400  -- 최대 컨텐츠 너비
+  -- 다단계 브레이크포인트 시스템
+  local breakpoints = {
+    { width = 2400, content_width = 2200 },  -- 울트라와이드 (최대 2200px)
+    { width = 1800, content_width = 1400 },  -- 일반 와이드
+    { width = 1200, content_width = 1000 },  -- 중간 크기
+  }
 
-  if window_dims.pixel_width > width_threshold then
-    -- 중앙 정렬을 위한 패딩 계산
-    local horizontal_padding = math.max(0, math.floor((window_dims.pixel_width - max_content_width) / 2))
+  -- 현재 창 크기에 맞는 브레이크포인트 찾기
+  local target_content_width = nil
+  for _, bp in ipairs(breakpoints) do
+    if window_dims.pixel_width >= bp.width then
+      target_content_width = bp.content_width
+      break
+    end
+  end
 
-    -- 상하 패딩도 조금 추가하여 균형잡힌 레이아웃
+  if target_content_width then
+    -- 가용 공간과 컨텐츠 너비의 차이 계산
+    local horizontal_space = window_dims.pixel_width - target_content_width
+
+    -- 좌우 패딩 균등 분배
+    local horizontal_padding = math.max(0, math.floor(horizontal_space / 2))
+
+    -- 셀 단위 정렬 (cols가 있을 때만)
+    if window_dims.cols and window_dims.cols > 0 then
+      local cell_width = window_dims.pixel_width / window_dims.cols
+      -- 셀 크기의 배수로 조정
+      local cells_for_padding = math.floor(horizontal_padding / cell_width)
+      horizontal_padding = cells_for_padding * cell_width
+    end
+
+    -- 상하 패딩
     local vertical_padding = '1.5cell'
 
     local new_padding = {
@@ -144,6 +167,12 @@ local function compute_responsive_padding(window)
     end
 
     overrides.window_padding = new_padding
+
+    -- 디버깅용 로그 (필요시 주석 해제)
+    -- wezterm.log_info(string.format(
+    --   'Window: %dpx, Target: %dpx, Padding: %dpx',
+    --   window_dims.pixel_width, target_content_width, horizontal_padding
+    -- ))
   else
     -- 작은 창에서는 기본 패딩 사용
     if overrides.window_padding then
