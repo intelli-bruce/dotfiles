@@ -29,7 +29,7 @@ return {
   
   -- mini.indentscope 설정 (LazyVim이 기본으로 사용)
   {
-    "echasnovski/mini.indentscope",
+    "nvim-mini/mini.indentscope",
     opts = {
       symbol = "│",
       options = { 
