@@ -13,7 +13,7 @@ alias c='clear'
 
 alias cl='claude'
 
-aliax cx='codex'
+alias cx='codex'
 
 alias b='brxce'
 
