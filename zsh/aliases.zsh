@@ -13,6 +13,8 @@ alias c='clear'
 
 alias cl='claude'
 
+aliax cx='codex'
+
 alias b='brxce'
 
 alias ba='brxce add'
