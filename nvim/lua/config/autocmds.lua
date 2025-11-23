@@ -39,3 +39,43 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lsp_highlight_document(client, bufnr)
   end,
 })
+
+-- 오늘자 Journal 파일을 열거나 템플릿을 복사해 생성하는 커맨드
+local function open_today_journal()
+  local dir = vim.fn.expand("~/Projects/bruce/Journal")
+  local date = os.date("%Y-%m-%d")
+  local file = dir .. "/" .. date .. ".md"
+
+  vim.fn.mkdir(dir, "p")
+
+  if vim.fn.filereadable(file) == 0 then
+    local tpl_path = vim.fn.expand("~/Projects/bruce/Templates/journal.md")
+    local lines = {}
+
+    if vim.fn.filereadable(tpl_path) == 1 then
+      lines = vim.fn.readfile(tpl_path)
+      for i, line in ipairs(lines) do
+        lines[i] = line:gsub("{{date}}", date)
+      end
+    else
+      lines = {
+        "# " .. date .. " Journal",
+        "",
+        "## Highlights",
+        "- ",
+        "",
+        "## Tasks",
+        "- [ ] ",
+        "",
+        "## Notes",
+        "- ",
+      }
+    end
+
+    vim.fn.writefile(lines, file)
+  end
+
+  vim.cmd("edit " .. file)
+end
+
+vim.api.nvim_create_user_command("Journal", open_today_journal, { desc = "Open today's journal file" })

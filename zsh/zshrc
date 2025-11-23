@@ -142,3 +142,10 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# Apple App Store Connect (Flutter TestFlight)
+export APPLE_ID="dev@intellieffect.com"
+export APPLE_APP_PASSWORD="lwuu-vbym-lgwv-wbmw"
+
+# Added by Antigravity
+export PATH="/Users/brucechoe/.antigravity/antigravity/bin:$PATH"
