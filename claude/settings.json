@@ -17,7 +17,7 @@
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
   },
-  "alwaysThinkingEnabled": false,
+  "alwaysThinkingEnabled": true,
   "brxce": {
     "cli_path": "brxce",
     "auto_update": true,

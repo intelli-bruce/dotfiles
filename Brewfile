@@ -26,6 +26,7 @@ brew "postgresql@15" # PostgreSQL 데이터베이스
 brew "node"      # Node.js
 brew "python@3.13" # Python 3.13
 brew "macism"    # 입력기 전환 도구 (Neovim im-select용)
+brew "pngpaste"  # Clipboard 이미지를 파일로 저장 (clipboard-image.nvim 등에서 사용)
 
 # 추가 CLI 도구 (선택사항)
 brew "uv"          # Python 패키지 관리자

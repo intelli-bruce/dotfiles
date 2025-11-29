@@ -165,6 +165,15 @@ return {
             DiagnosticWarn = { fg = "#FFB86C" },
             DiagnosticInfo = { fg = "#8BE9FD" },
             DiagnosticHint = { fg = "#50FA7B" },
+
+            -- Markdown 일반 텍스트/강조 색상 (기본 주황 대신 뉴트럴 톤)
+            ["@markup"] = { fg = colors.fg },
+            ["@markup.strong"] = { fg = colors.fg, bold = true },
+            ["@markup.emphasis"] = { fg = colors.fg, italic = true },
+            ["@markup.list"] = { fg = colors.cyan },
+            ["@markup.link"] = { fg = colors.cyan, underline = true },
+            ["@markup.link.url"] = { fg = colors.cyan, italic = true },
+            ["@markup.raw"] = { fg = colors.yellow },
             
             -- 매칭 괄호
             MatchParen = { fg = "#F8F8F2", bg = "#747A9D", bold = true },

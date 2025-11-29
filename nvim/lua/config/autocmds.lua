@@ -79,3 +79,18 @@ local function open_today_journal()
 end
 
 vim.api.nvim_create_user_command("Journal", open_today_journal, { desc = "Open today's journal file" })
+
+-- Markdown 일반 텍스트 색상 뉴트럴 톤으로 고정 (테마/플러그인 후킹 대비)
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("markdown_markup_neutral", { clear = true }),
+  callback = function()
+    local neutral = { fg = vim.g.terminal_color_foreground or "#F8F8F2" }
+    vim.api.nvim_set_hl(0, "@markup", neutral)
+    vim.api.nvim_set_hl(0, "@markup.strong", vim.tbl_extend("force", neutral, { bold = true }))
+    vim.api.nvim_set_hl(0, "@markup.emphasis", vim.tbl_extend("force", neutral, { italic = true }))
+    vim.api.nvim_set_hl(0, "@markup.list", { fg = "#8BE9FD" })
+    vim.api.nvim_set_hl(0, "@markup.link", { fg = "#8BE9FD", underline = true })
+    vim.api.nvim_set_hl(0, "@markup.link.url", { fg = "#8BE9FD", italic = true })
+    vim.api.nvim_set_hl(0, "@markup.raw", { fg = "#F1FA8C" })
+  end,
+})

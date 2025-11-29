@@ -20,3 +20,6 @@ alias b='brxce'
 alias ba='brxce add'
 
 alias bt='brxce wn tree'
+
+# bruce 프로젝트 폴더 열기
+alias bn='nv ~/Projects/bruce'
