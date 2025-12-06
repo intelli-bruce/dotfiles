@@ -9,6 +9,9 @@ end
 
 local act = wezterm.action
 
+-- 창별 메모 저장소 (세션 중에만 유지)
+local window_notes = {}
+
 -- 기본 설정
 config.automatically_reload_config = true
 config.use_ime = true
@@ -63,7 +66,7 @@ config.colors = {
 config.window_background_opacity = 1.0
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 
--- 타이틀바 색상
+-- 타이틀바/탭 바 설정
 config.window_frame = {
 	inactive_titlebar_bg = "#191B21",
 	active_titlebar_bg = "#191B21",
@@ -71,7 +74,12 @@ config.window_frame = {
 	active_titlebar_fg = "#FFFFFF",
 	inactive_titlebar_border_bottom = "#191B21",
 	active_titlebar_border_bottom = "#191B21",
-	font_size = 12.0,
+	font = wezterm.font_with_fallback({
+		"JetBrainsMono Nerd Font Mono",
+		"D2Coding",
+		"Apple SD Gothic Neo",
+	}),
+	font_size = 16.0, -- 탭/메모 폰트 크기
 }
 
 -- 패딩 설정
@@ -84,7 +92,7 @@ config.window_padding = {
 
 -- 탭 바 설정
 config.enable_tab_bar = true
-config.hide_tab_bar_if_only_one_tab = true
+config.hide_tab_bar_if_only_one_tab = false -- 메모 표시를 위해 항상 탭 바 표시
 config.tab_bar_at_bottom = false
 config.use_fancy_tab_bar = true
 
@@ -202,10 +210,63 @@ wezterm.on("gui-startup", function(cmd)
 	end)
 end)
 
+-- 창 메모 입력 액션 (한/영 키 바인딩 공유용)
+local note_input_action = wezterm.action_callback(function(window, pane)
+	local window_id = tostring(window:window_id())
+	local current_note = window_notes[window_id] or ""
+
+	-- macOS osascript dialog 사용 (한글 IME 지원)
+	local success, stdout, stderr = wezterm.run_child_process({
+		"osascript",
+		"-e",
+		string.format(
+			[[
+			set dialogResult to display dialog "창 메모 입력 (빈칸 입력시 삭제):" default answer "%s" buttons {"취소", "확인"} default button "확인"
+			if button returned of dialogResult is "확인" then
+				return text returned of dialogResult
+			else
+				return "___CANCEL___"
+			end if
+		]],
+			current_note
+		),
+	})
+
+	if success then
+		local result = stdout:gsub("[\n\r]", "")
+		if result ~= "___CANCEL___" then
+			if result == "" then
+				window_notes[window_id] = nil
+			else
+				window_notes[window_id] = result
+			end
+		end
+	end
+end)
+
+-- 창 메모 상태 표시줄 업데이트
+wezterm.on("update-status", function(window, pane)
+	local window_id = tostring(window:window_id())
+	local note = window_notes[window_id] or ""
+
+	if note ~= "" then
+		window:set_right_status(wezterm.format({
+			{ Foreground = { Color = "#bd93f9" } },
+			{ Text = "📝 " .. note .. "    " },
+		}))
+	else
+		window:set_right_status("")
+	end
+end)
+
 -- 키 바인딩
 config.keys = {
 	-- 설정 다시 로드
 	{ key = "r", mods = "CMD|SHIFT", action = act.ReloadConfiguration },
+
+	-- 창 메모 입력/수정 (한/영 모두 지원)
+	{ key = "n", mods = "CMD|SHIFT", action = note_input_action },
+	{ key = "ㅜ", mods = "CMD|SHIFT", action = note_input_action },
 
 	-- Shift+Enter로 \x1b\r 전송
 	{ key = "Enter", mods = "SHIFT", action = wezterm.action({ SendString = "\x1b\r" }) },
