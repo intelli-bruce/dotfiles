@@ -1,20 +1,18 @@
 # Lazygit 설정
 git:
-  paging:
-    colorArg: always
-    pager: delta --paging=never --side-by-side --line-numbers
-    useConfig: false
+  pagers:
+    - colorArg: always
+      pager: delta --paging=never --side-by-side --line-numbers
+      useConfig: false
   log:
-    showWholeGraph: true  # 모든 브랜치를 그래프에 표시
-
+    showWholeGraph: true # 모든 브랜치를 그래프에 표시
 keybinding:
   universal:
-    prevBlock-alt: 'h'  # 이전 블록으로 이동 (alt+h)
-    nextBlock-alt: 'l'  # 다음 블록으로 이동 (alt+l)
+    prevBlock-alt: 'h' # 이전 블록으로 이동 (alt+h)
+    nextBlock-alt: 'l' # 다음 블록으로 이동 (alt+l)
   files:
-    prevHunk: 'h'  # 이전 hunk로 이동
-    nextHunk: 'l'  # 다음 hunk로 이동
-
+    prevHunk: 'h' # 이전 hunk로 이동
+    nextHunk: 'l' # 다음 hunk로 이동
 gui:
   theme:
     activeBorderColor:
@@ -34,13 +32,13 @@ gui:
       - blue
     unstagedChangesColor:
       - red
+      # Dracula theme colors
 
-# Dracula theme colors
-  # Foreground color: #f8f8f2
-  # Background color: #282a36
-  # Selection/comment: #44475a
-  # Green: #50fa7b
-  # Red: #ff5555
-  # Purple: #bd93f9
-  # Yellow: #f1fa8c
-  # Pink: #ff79c6
+# Foreground color: #f8f8f2
+# Background color: #282a36
+# Selection/comment: #44475a
+# Green: #50fa7b
+# Red: #ff5555
+# Purple: #bd93f9
+# Yellow: #f1fa8c
+# Pink: #ff79c6

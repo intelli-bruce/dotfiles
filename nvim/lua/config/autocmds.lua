@@ -94,3 +94,6 @@ vim.api.nvim_create_autocmd("ColorScheme", {
     vim.api.nvim_set_hl(0, "@markup.raw", { fg = "#F1FA8C" })
   end,
 })
+
+-- Markdown 등에서 맞춤법 검사 비활성화 (LazyVim 기본 설정 제거)
+vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
