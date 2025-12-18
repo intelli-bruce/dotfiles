@@ -17,6 +17,31 @@ map("n", ";t", function()
   vim.cmd("startinsert!")
 end, { desc = "Add timestamp at bottom" })
 
+-- Git add all + commit (메시지 입력)
+map("n", ";c", function()
+  vim.ui.input({ prompt = "Commit message: " }, function(msg)
+    if not msg or msg == "" then
+      return
+    end
+    vim.cmd("silent !git add -A")
+    vim.fn.system('git commit -m "' .. msg:gsub('"', '\\"') .. '"')
+    vim.notify("Committed: " .. msg, vim.log.levels.INFO)
+  end)
+end, { desc = "Git add all + commit" })
+
+-- Git add all + commit + push
+map("n", ";cp", function()
+  vim.ui.input({ prompt = "Commit message: " }, function(msg)
+    if not msg or msg == "" then
+      return
+    end
+    vim.cmd("silent !git add -A")
+    vim.fn.system('git commit -m "' .. msg:gsub('"', '\\"') .. '"')
+    vim.fn.system("git push")
+    vim.notify("Committed & Pushed: " .. msg, vim.log.levels.INFO)
+  end)
+end, { desc = "Git add all + commit + push" })
+
 -- 줄 번호 토글
 map("n", "<leader>tn", function()
   vim.o.number = not vim.o.number
