@@ -40,45 +40,139 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
--- 오늘자 Journal 파일을 열거나 템플릿을 복사해 생성하는 커맨드
-local function open_today_journal()
-  local dir = vim.fn.expand("~/Projects/bruce/Journal")
-  local date = os.date("%Y-%m-%d")
-  local file = dir .. "/" .. date .. ".md"
+-- 통합 Journal 파일 열기 및 새 엔트리 추가
+local function open_journal()
+  local file = vim.fn.expand("~/Projects/bruce/journal.md")
+  local datetime = os.date("%Y-%m-%d %H:%M:%S")
 
-  vim.fn.mkdir(dir, "p")
-
+  -- 파일이 없으면 헤더와 함께 생성
   if vim.fn.filereadable(file) == 0 then
-    local tpl_path = vim.fn.expand("~/Projects/bruce/Templates/journal.md")
-    local lines = {}
-
-    if vim.fn.filereadable(tpl_path) == 1 then
-      lines = vim.fn.readfile(tpl_path)
-      for i, line in ipairs(lines) do
-        lines[i] = line:gsub("{{date}}", date)
-      end
-    else
-      lines = {
-        "# " .. date .. " Journal",
-        "",
-        "## Highlights",
-        "- ",
-        "",
-        "## Tasks",
-        "- [ ] ",
-        "",
-        "## Notes",
-        "- ",
-      }
-    end
-
-    vim.fn.writefile(lines, file)
+    vim.fn.writefile({ "# Journal", "" }, file)
   end
 
+  -- 파일 열기
   vim.cmd("edit " .. file)
+
+  -- 파일 끝으로 이동 후 새 엔트리 추가
+  vim.cmd("normal! G")
+  local lines = { "", "---", "", "## " .. datetime, "", "" }
+  vim.api.nvim_put(lines, "l", true, true)
+
+  -- 마지막 줄에서 insert 모드로 전환
+  vim.cmd("normal! G")
+  vim.cmd("startinsert!")
 end
 
-vim.api.nvim_create_user_command("Journal", open_today_journal, { desc = "Open today's journal file" })
+vim.api.nvim_create_user_command("Journal", open_journal, { desc = "Open journal and add new entry" })
+
+-- 새 책 노트 생성 (카카오 책 검색 API 연동 + Telescope)
+local function create_book_note()
+  local kakao_api_key = "c70ca47eab4937b289c25f7a2619e377"
+
+  vim.ui.input({ prompt = "책 검색: " }, function(query)
+    if not query or query == "" then
+      return
+    end
+
+    -- 카카오 API로 책 검색 (10개 결과)
+    local encoded_query = vim.fn.system("printf %s " .. vim.fn.shellescape(query) .. " | jq -sRr @uri"):gsub("\n", "")
+    local curl_cmd = string.format(
+      'curl -s -H "Authorization: KakaoAK %s" "https://dapi.kakao.com/v3/search/book?query=%s&size=10"',
+      kakao_api_key,
+      encoded_query
+    )
+    local result = vim.fn.system(curl_cmd)
+    local ok, data = pcall(vim.fn.json_decode, result)
+
+    if not ok or not data or not data.documents or #data.documents == 0 then
+      vim.notify("검색 결과가 없습니다: " .. query, vim.log.levels.WARN)
+      return
+    end
+
+    -- Telescope로 결과 선택
+    local pickers = require("telescope.pickers")
+    local finders = require("telescope.finders")
+    local conf = require("telescope.config").values
+    local actions = require("telescope.actions")
+    local action_state = require("telescope.actions.state")
+
+    local books = {}
+    for _, book in ipairs(data.documents) do
+      table.insert(books, {
+        title = book.title or "",
+        author = table.concat(book.authors or {}, ", "),
+        publisher = book.publisher or "",
+        cover = book.thumbnail or "",
+        isbn = book.isbn or "",
+        display = string.format("%s | %s | %s", book.title or "", table.concat(book.authors or {}, ", "), book.publisher or ""),
+      })
+    end
+
+    pickers
+      .new({}, {
+        prompt_title = "책 선택",
+        finder = finders.new_table({
+          results = books,
+          entry_maker = function(entry)
+            return {
+              value = entry,
+              display = entry.display,
+              ordinal = entry.display,
+            }
+          end,
+        }),
+        sorter = conf.generic_sorter({}),
+        attach_mappings = function(prompt_bufnr, _)
+          actions.select_default:replace(function()
+            local selection = action_state.get_selected_entry()
+            actions.close(prompt_bufnr)
+
+            if not selection then
+              return
+            end
+
+            local book = selection.value
+            local notes_dir = vim.fn.expand("~/Projects/bruce/Learning/Books/notes/")
+            local safe_title = book.title:gsub("[/\\:*?\"<>|]", "-")
+            local file_path = notes_dir .. safe_title .. ".md"
+            local datetime = os.date("%Y-%m-%d")
+
+            local template = {
+              "---",
+              'title: "' .. book.title .. '"',
+              "author:",
+              '  - "' .. book.author .. '"',
+              "publisher: " .. book.publisher,
+              "isbn: " .. book.isbn,
+              'status: "To Read"',
+              'platform: ""',
+              "cover: " .. book.cover,
+              "created: " .. datetime,
+              "updated: " .. datetime,
+              "---",
+              "",
+              "## Highlights",
+              "- ",
+              "",
+              "## Summary",
+              "- ",
+              "",
+              "## Actions / Questions",
+              "- ",
+            }
+
+            vim.fn.writefile(template, file_path)
+            vim.cmd("edit " .. vim.fn.fnameescape(file_path))
+            vim.notify("책 노트 생성: " .. book.title, vim.log.levels.INFO)
+          end)
+          return true
+        end,
+      })
+      :find()
+  end)
+end
+
+vim.api.nvim_create_user_command("BookNote", create_book_note, { desc = "Create new book note" })
 
 -- Markdown 일반 텍스트 색상 뉴트럴 톤으로 고정 (테마/플러그인 후킹 대비)
 vim.api.nvim_create_autocmd("ColorScheme", {

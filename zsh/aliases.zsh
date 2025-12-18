@@ -21,8 +21,8 @@ alias ba='brxce add'
 
 alias bt='brxce wn tree'
 
-# bruce 프로젝트 폴더 열기
-alias bn='cd ~/Projects/bruce && nv'
+# Journal 열기
+alias bn='nvim ~/Projects/bruce/Journal.md'
 
 # docker logs for brxce-backend-dev
 alias l1='docker logs -f brxce-backend-dev 2>&1 | grep "BRXCE:AGENT"'

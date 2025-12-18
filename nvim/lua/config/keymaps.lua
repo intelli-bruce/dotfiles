@@ -4,26 +4,37 @@
 
 local map = vim.keymap.set
 
--- 오늘자 Journal 파일 열기 (커맨드 래핑)
-map("n", "<leader>jj", "<cmd>Journal<cr>", { desc = "Open today's Journal" })
+-- 통합 Journal 열기 및 새 엔트리 추가
+map("n", ";;", "<cmd>Journal<cr>", { desc = "Open Journal (add new entry)" })
+
+-- 최하단에 타임스탬프 추가 (Journal 내에서 사용)
+map("n", ";t", function()
+  local datetime = os.date("%Y-%m-%d %H:%M:%S")
+  vim.cmd("normal! G")
+  local lines = { "", "---", "", "## " .. datetime, "", "" }
+  vim.api.nvim_put(lines, "l", true, true)
+  vim.cmd("normal! G")
+  vim.cmd("startinsert!")
+end, { desc = "Add timestamp at bottom" })
+
+-- 줄 번호 토글
+map("n", "<leader>tn", function()
+  vim.o.number = not vim.o.number
+  vim.o.relativenumber = not vim.o.relativenumber
+end, { desc = "Toggle line numbers" })
+
+-- Diagnostics 토글
+map("n", "<leader>td", function()
+  vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { desc = "Toggle diagnostics" })
+
+-- 새 책 노트 생성
+map("n", "<leader>bn", "<cmd>BookNote<cr>", { desc = "Create new book note" })
+
+-- Visual 모드에서 하이라이트 (==텍스트==)
+map("v", "<leader>h", 'c==<C-r>"==<Esc>', { desc = "Highlight selection" })
 
 -- Markdown 파일을 Marked 2에서 미리보기
 map("n", "<leader>mp", function()
   vim.fn.system('open -a "Marked 2" ' .. vim.fn.shellescape(vim.fn.expand("%:p")))
 end, { desc = "Preview in Marked 2" })
-
--- 타임스탬프 기반 새 노트 생성 및 열기
-map("n", "<leader>jn", function()
-  local base_dir = "/Volumes/WorkSSD/Projects/bruce/Notes"
-  local filename = os.date("%Y-%m-%d_%H-%M-%S") .. ".md"
-  local human_ts = os.date("%Y-%m-%d %H:%M:%S")
-  local path = base_dir .. "/" .. filename
-
-  vim.fn.mkdir(base_dir, "p")
-
-  if vim.fn.filereadable(path) == 0 then
-    vim.fn.writefile({ "# " .. human_ts, "" }, path)
-  end
-
-  vim.cmd("edit " .. vim.fn.fnameescape(path))
-end, { desc = "New Journal note (timestamp)" })
